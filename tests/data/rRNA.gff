@@ -1,0 +1,8 @@
+EMBOSS_001|consensus	MAD	ETS	1	249	.	.	.	name=ETS
+EMBOSS_001|consensus	MAD	rRNA	250	4210	.	.	.	name=28S_rRNA
+EMBOSS_001|consensus	MAD	ITS	4211	4499	.	.	.	name=ITS2
+EMBOSS_001|consensus	MAD	rRNA	4500	4730	.	.	.	name=5.8S_rRNA
+EMBOSS_001|consensus	MAD	ITS	4731	4989	.	.	.	name=ITS1
+EMBOSS_001|consensus	MAD	rRNA	4990	6710	.	.	.	name=18S_rRNA
+gi|15079186:1020-1971	MAD	rRNA	1	952	.	.	.	name=12S_rRNA
+gi|15079186:2043-3725	MAD	rRNA	1	1683	.	.	.	name=16S_rRNA
