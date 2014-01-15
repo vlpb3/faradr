@@ -1,3 +1,4 @@
+library(stringr)
 context('qc')
 
 # location of sample data for testing
@@ -17,6 +18,13 @@ test_that("PlotMMDist outputs plot", {
   bamfile <- file.path(dataDir, "sample.bam") 
   plotfile <- file.path(dataDir, "test_mmplot.png")
   PlotMMDist(bamfile, plotfile)
+  expect_true(file.exists(plotfile)) 
+})
+
+test_that("PlotMMFracDist outputs plot", {                           
+  bamfile <- file.path(dataDir, "sample.bam") 
+  plotfile <- file.path(dataDir, "test_mmpfrcplot.png")
+  PlotMMFracDist(bamfile, plotfile)
   expect_true(file.exists(plotfile)) 
 })
 
