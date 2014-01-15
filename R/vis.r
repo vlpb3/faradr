@@ -1,6 +1,6 @@
 library(ggbio)
 
-#' Plot aligned reads over annotated region
+#' Plot aligned reads over annotated region.
 #' @param aln read alignments in GAlignments objet (GenomicTRanges)
 #' @param annot genome annotations in GRanges object
 PlotAlignAnnot <- function(aln, annots, plotfile) {
@@ -15,7 +15,7 @@ PlotAlignAnnot <- function(aln, annots, plotfile) {
     dev.off()
 }
 
-#' Plot aligned reads over annotated region
+#' Plot aligned reads over annotated region.
 #' @param aln read alignments in GAlignments objet (GenomicTRanges)
 #' @param annot genome annotations in GRanges object
 PlotCoverageAnnot <- function(aln, annots, plotfile) {

@@ -1,8 +1,8 @@
-\name{plot_mm_dis}
-\alias{plot_mm_dis}
+\name{PlotMMDist}
+\alias{PlotMMDist}
 \title{Plot distribution of mismatches and indels in reads.}
 \usage{
-  plot_mm_dis(bamfile, plotfile)
+  PlotMMDist(bamfile, plotfile)
 }
 \arguments{
   \item{bamfile}{string bamfile filepath}
