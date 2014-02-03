@@ -1,4 +1,5 @@
 library(GenomicRanges)
+library(ShortRead)
 library(Rsamtools)
 
 #' Plot distribution of mismatches and indels in reads. 
@@ -37,4 +38,27 @@ PlotMMFracDist <- function(bamfile, plotfile) {
        ylab="Number of reads",
        cex.lab=2, cex.main=2)
   dev.off()
+}
+
+#' Get quality statistics.
+#' 
+#' Calculates number of bases ans average lenght of the read
+#' with quality above provided.
+#' @param fastq stiring path to fastq file
+#' @param q.threshold integer minimum allowed quality
+#' @return list with average read length and gnumber of bases
+#'  meeting quality requirements
+GeneralQualityStats <- function(fastq, q.threshold) {
+  encod <- encoding(quality(fastq)) 
+  if (! q.threshold %in% encod) {
+    min.qual <- range(encod)[1]
+    max.qual <- range(encod)[2]
+    print(paste("Quality threshold has to be within the range from",
+                min.qual, "to", max.qual))   
+  }
+  q <- names(encod[encod == q.threshold])
+  trimmed.fq <- trimTails(fastq, 1, q, successive=F)  
+  mean.rlen <- mean(width(trimmed.fq)) 
+  n.qual.bases <- sum(width(trimmed.fq))  
+  return(list(mean.rlen=mean.rlen, n.qual.bases=n.qual.bases))
 }
