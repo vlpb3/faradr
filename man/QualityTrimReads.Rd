@@ -1,0 +1,19 @@
+\name{QualityTrimReads}
+\alias{QualityTrimReads}
+\title{Trim fastq reads.}
+\usage{
+  QualityTrimReads(sreadq, min.quality)
+}
+\arguments{
+  \item{sreadq}{ShortReadQ object}
+
+  \item{min.quality}{integer minimum allowed quality}
+}
+\value{
+  ShortReadQ object with trimmed reads
+}
+\description{
+  Trim reads from 3' end leaving only bases of quality
+  equal or above min.quality.
+}
+

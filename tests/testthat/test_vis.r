@@ -16,7 +16,7 @@ cleanup <- function() {
   file.remove(test.file.paths)
 }
 
-test_that("Plotting functions in vis generate and saves a plots",{
+test_that("Plotting functions in vis generates and saves a plots",{
   # input files
   gfffile <- file.path(dataDir, "rRNA.gff")
   bamfile <- file.path(dataDir, "sample.bam")
@@ -33,7 +33,7 @@ test_that("Plotting functions in vis generate and saves a plots",{
   consensus.aln <- readGAlignments(bamfile, param=param)
   
   # get rid of unused selevels
-  seqlevels(consensus.aln) <- cons.id
+  seqlevels(consensus.aln) <- consensusSeqId
   
   ## fetch only consensus sequence from gff
   consensus.annots <- gff[seqnames(gff)==consensusSeqId]

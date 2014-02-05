@@ -2,7 +2,7 @@ library(GenomicRanges)
 library(ShortRead)
 library(Rsamtools)
 
-#' Plot distribution of mismatches and indels in reads. 
+#' Plot distribution of mismatches and indels in alignment. 
 #' 
 #' @param bamfile string bamfile filepath
 #' @param plotfile string output png filepath 
@@ -19,7 +19,7 @@ PlotMMDist <- function(bamfile, plotfile) {
   dev.off()
 }
 
-#' Plot fraction of mismatches and indels.
+#' Plot fraction of mismatches and indels in alignment.
 #'
 #' It is calculated by dividing read length
 #' by edit distance (NM tag in bam file).
@@ -62,3 +62,6 @@ GeneralQualityStats <- function(fastq, q.threshold) {
   n.qual.bases <- sum(width(trimmed.fq))  
   return(list(mean.rlen=mean.rlen, n.qual.bases=n.qual.bases))
 }
+
+#' Make read statistics table
+#' 

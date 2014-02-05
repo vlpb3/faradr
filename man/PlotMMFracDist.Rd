@@ -1,6 +1,6 @@
 \name{PlotMMFracDist}
 \alias{PlotMMFracDist}
-\title{Plot fraction of mismatches and indels.}
+\title{Plot fraction of mismatches and indels in alignment.}
 \usage{
   PlotMMFracDist(bamfile, plotfile)
 }
