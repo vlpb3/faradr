@@ -34,12 +34,12 @@ PlotCoverageAnnot <- function(aln, annots, plotfile) {
     dev.off()
 }
 
-#' Plot qaality scores per cycle
+#' Plot quality scores per cycle
 #' @param data.dir string path to data
 #' @param file.pattern string pattern for input files
 #' @param type stirng input type, 'fastq' is default value
 #' @return plot 
-PlotPerCycleQualityScores <- function(data.dir, file.pattern, type="fastq") {
+PlotPerCycleQuality <- function(data.dir, file.pattern, type="fastq") {
     max.rlen <- 200
     sreadq.qa <- qa(data.dir, file.pattern, type=type)
     perCycle <- sreadq.qa[["perCycle"]]
@@ -48,5 +48,15 @@ PlotPerCycleQualityScores <- function(data.dir, file.pattern, type="fastq") {
     pcq <- perCycle.q[rep(seq_len(nrow(perCycle.q)), perCycle.q$Count), ]
     p <- ggplot(pcq, aes(factor(Cycle), Score))
     p <- p + geom_boxplot()
+    return(p)
+}
+
+#' Plot mean quality per read
+#' @param sreadq ShortReadQ object
+#' @return plot
+PlotMeanReadQality <- function(sreadq) {
+    qm <- as(quality(sreadq), "matrix") 
+    qmeans <- data.frame(mean_quality=rowMeans(qm, na.rm=T))
+    p <- qplot(mean_quality, data=qmeans, geom="histogram", binwidth=0.5) 
     return(p)
 }
