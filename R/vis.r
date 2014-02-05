@@ -60,3 +60,13 @@ PlotMeanReadQality <- function(sreadq) {
     p <- qplot(mean_quality, data=qmeans, geom="histogram", binwidth=0.5) 
     return(p)
 }
+
+#' Plot read length distribution
+#' @param sreadq ShortReadQ object
+#' @return plot
+PlotReadLengthDistribution <- function(sreadq) {
+    max.rlen <- 75
+    rlens <- data.frame(read_len=width(sreadq[width(sreadq) <= 75]))
+    p <- qplot(read_len, data=rlens, geom="histogram", binwidth=1) 
+    return(p)
+}
