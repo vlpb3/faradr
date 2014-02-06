@@ -41,6 +41,7 @@ PlotCoverageAnnot <- function(aln, annots, plotfile) {
 #' @param type stirng input type, 'fastq' is default value
 #' @return plot 
 PlotPerCycleQuality <- function(data.dir, file.pattern, type="fastq") {
+    require(ggplot2)
     max.rlen <- 200
     sreadq.qa <- qa(data.dir, file.pattern, type=type)
     perCycle <- sreadq.qa[["perCycle"]]
@@ -58,7 +59,8 @@ PlotPerCycleQuality <- function(data.dir, file.pattern, type="fastq") {
 PlotMeanReadQality <- function(sreadq) {
     qm <- as(quality(sreadq), "matrix") 
     qmeans <- data.frame(mean_quality=rowMeans(qm, na.rm=T))
-    p <- qplot(mean_quality, data=qmeans, geom="histogram", binwidth=0.5) 
+    p <- qplot(mean_quality, data=qmeans, geom="histogram",
+               binwidth=0.5, alpha=I(0.7)) 
     return(p)
 }
 
@@ -68,16 +70,20 @@ PlotMeanReadQality <- function(sreadq) {
 PlotReadLengthDistribution <- function(sreadq) {
     max.rlen <- 75
     rlens <- data.frame(read_len=width(sreadq[width(sreadq) <= 75]))
-    p <- qplot(read_len, data=rlens, geom="histogram", binwidth=1) 
+    p <- qplot(read_len, data=rlens, geom="histogram",
+               binwidth=1, alpha=I(0.7))
     return(p)
 }
 
-#' Plot quality scores per cycle
+#' Plot base call per cycle
 #' @param data.dir string path to data
 #' @param file.pattern string pattern for input files
 #' @param type stirng input type, 'fastq' is default value
 #' @return plot 
-PlotPerCycleQuality <- function(data.dir, file.pattern, type="fastq") {
+PlotPerCycleBaseCalls <- function(data.dir, file.pattern, type="fastq") {
+    require(ggplot2)  
+    require(plyr)
+    
     sreadq.qa <- qa(data.dir, file.pattern, type=type)
     perCycleBaseCall <- sreadq.qa[["perCycle"]]$baseCall
     perCycleCounts  <- ddply(perCycleBaseCall, c("Cycle"), summarise,

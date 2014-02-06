@@ -62,6 +62,3 @@ GeneralQualityStats <- function(fastq, q.threshold) {
   n.qual.bases <- sum(width(trimmed.fq))  
   return(list(mean.rlen=mean.rlen, n.qual.bases=n.qual.bases))
 }
-
-#' Make read statistics table
-#' 
