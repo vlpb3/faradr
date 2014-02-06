@@ -1,6 +1,7 @@
 library(ShortRead)
 library(ggbio)
 library(ggplot2)
+library(plyr)
 
 #' Plot aligned reads over annotated region.
 #' @param aln read alignments in GAlignments objet (GenomicTRanges)
@@ -70,3 +71,21 @@ PlotReadLengthDistribution <- function(sreadq) {
     p <- qplot(read_len, data=rlens, geom="histogram", binwidth=1) 
     return(p)
 }
+
+#' Plot quality scores per cycle
+#' @param data.dir string path to data
+#' @param file.pattern string pattern for input files
+#' @param type stirng input type, 'fastq' is default value
+#' @return plot 
+PlotPerCycleQuality <- function(data.dir, file.pattern, type="fastq") {
+    sreadq.qa <- qa(data.dir, file.pattern, type=type)
+    perCycleBaseCall <- sreadq.qa[["perCycle"]]$baseCall
+    perCycleCounts  <- ddply(perCycleBaseCall, c("Cycle"), summarise,
+                           countsInCycle = sum(Count))
+    perCycleBaseCall$callsFraction <- perCycleBaseCall$Count / perCycleCounts$countsInCycle[perCycleBaseCall$Cycle] 
+    p <- ggplot(perCycleBaseCall, aes(Cycle, callsFraction))
+    p <- p + geom_point(aes(colour=factor(Base)), alpha=0.7)
+    p <- p + geom_line(aes(colour=factor(Base)), alpha=0.7) 
+    return(p)
+}
+
