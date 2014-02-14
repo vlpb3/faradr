@@ -2,7 +2,7 @@
 \alias{PlotReadLengthDistribution}
 \title{Plot read length distribution}
 \usage{
-  PlotReadLengthDistribution(sreadq)
+  PlotReadLengthDistribution(data.dir, file.pattern)
 }
 \arguments{
   \item{sreadq}{ShortReadQ object}

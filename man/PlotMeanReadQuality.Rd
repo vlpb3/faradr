@@ -1,8 +1,8 @@
-\name{PlotMeanReadQality}
-\alias{PlotMeanReadQality}
+\name{PlotMeanReadQuality}
+\alias{PlotMeanReadQuality}
 \title{Plot mean quality per read}
 \usage{
-  PlotMeanReadQality(data.dir, file.pattern)
+  PlotMeanReadQuality(data.dir, file.pattern)
 }
 \arguments{
   \item{sreadq}{ShortReadQ object}
