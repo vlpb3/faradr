@@ -10,7 +10,7 @@
   \item{file.pattern}{string pattern for input files}
 }
 \value{
-  plot
+  plot object
 }
 \description{
   Plot quality scores per cycle

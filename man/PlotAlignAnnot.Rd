@@ -9,6 +9,8 @@
   (GenomicTRanges)}
 
   \item{annot}{genome annotations in GRanges object}
+
+  \item{plotfile}{path for output plot}
 }
 \description{
   Plot aligned reads over annotated region.

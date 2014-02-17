@@ -5,10 +5,12 @@
   PlotMeanReadQuality(data.dir, file.pattern)
 }
 \arguments{
-  \item{sreadq}{ShortReadQ object}
+  \item{data.dir}{path to data dir}
+
+  \item{file.pattern}{pattern of input fastq}
 }
 \value{
-  plot
+  plot object
 }
 \description{
   Plot mean quality per read
