@@ -170,6 +170,16 @@ Aplot <- function(data.dir, file.pattern) {
   p <- p + labs(x="Sample", y="Number of Reads")
   return(p)
 }
+
+Aplot2 <- function(fqc) {
+  df <- data.frame(nReads=fqc[['readCounts']]$read,
+                   sample=row.names(fqc[['readCounts']]))
+  p <- ggplot(df, aes(x=sample, y=nReads, fill=sample))
+  p <- p + geom_bar(alpha=0.6, stat='identity')
+  p <- p + theme(legend.position="none", axis.text.x=element_text(angle=45, hjust=1))
+  p <- p + labs(x="Sample", y="Number of Reads")
+  return(p)
+}
   
 B1plot <- function(data.dir, file.pattern){
   samples <- list.files(data.dir, file.pattern)
@@ -184,6 +194,16 @@ B1plot <- function(data.dir, file.pattern){
   rlen.limit <- quantile(df$read.length, 0.95)
   p <- ggplot(df, aes(read.length, group=sample, colour=sample))
   p <- p + geom_density(alpha=I(0.4), adjust=3) + xlim(0, rlen.limit)
+  p <- p + labs(x="Read Length", y="Fraction of Reads", colour="Sample")
+}
+
+B1plot2 <- function(samples) {
+  rlens <- lapply(samples, width)
+  df <- data.frame(sample=rep(names(samples), lapply(rlens, length)),
+                   rlen=unlist(rlens), row.names=NULL)
+  q95rlen <- quantile(df$rlen, 0.95)
+  p <- ggplot(df, aes(rlen, group=sample, colour=sample))
+  p <- p + geom_density(alpha=I(0.4), adjust=3) + xlim(0, q95rlen)
   p <- p + labs(x="Read Length", y="Fraction of Reads", colour="Sample")
 }
 
@@ -216,6 +236,22 @@ B2plot <- function(data.dir, file.pattern) {
   return(p)
 }
 
+B2plot2 <- function(samples) {
+  rlens <- lapply(samples, width)
+  df <- data.frame(sample=rep(names(rlens), lapply(rlens, length)),
+                   rlen=unlist(rlens), row.names=NULL)
+  q95rlen <- quantile(df$rlen, 0.95)
+  df <- ddply(df, .(sample, rlen), transform, counts=length(rlen))
+  df <- df[!duplicated(df), ]
+  df <- ddply(df, .(sample), mutate,
+              cum.counts=cumsum(counts),
+              frac.counts=cum.counts/sum(counts))
+  p <- ggplot(df, aes(group=sample, colour=sample ))
+  p <- p + geom_line(aes(rlen, 1-frac.counts), alpha=0.4)
+  p <- p + xlim(min(df$rlen), q95rlen)
+  p <- p + labs(x="Read Length", y="Fraction of Reads", colour="Sample")
+}
+
 C1plot <- function(data.dir, file.pattern) {
   count.qmeans <- function(s, data.dir) {
     fq <- yield(FastqSampler(file.path(data.dir, s), n=1000000))  
@@ -231,6 +267,21 @@ C1plot <- function(data.dir, file.pattern) {
   p <- p + theme(legend.position="none", axis.text.x=element_text(angle=45, hjust=1))
   p <- p + labs(x="Sample", y="Mean Read Quality")
   return(p)
+}
+
+C1plot2 <- function(samples) {
+  calc.qmeans <- function(fq) {
+    qm <- as(quality(fq), "matrix")
+    row.means <- rowMeans(qm, na.rm=T)
+    return(row.means)
+  }
+  qmeans <- lapply(samples, calc.qmeans)
+  df <- data.frame(sample=rep(names(qmeans), lapply(qmeans, length)),
+                   qmeans=unlist(qmeans), row.names=NULL)
+  p <- ggplot(df, aes(factor(sample), qmeans, fill=sample))
+  p <- p + geom_boxplot(alpha=0.6)
+  p <- p + theme(legend.position="none", axis.text.x=element_text(angle=45, hjust=1))
+  p <- p + labs(x="Sample", y="Mean Read Quality")
 }
 
 C2plot <- function(data.dir, file.pattern) {
@@ -252,6 +303,21 @@ C2plot <- function(data.dir, file.pattern) {
   p <- p + geom_line(alpha=0.4) + xlim(0,rlen.limit)
   p <- p + labs(x="Position in the Read", y="Mean Base Quality", colour="Sample")
   return(p)
+}
+
+C2plot2 <- function(samples) {
+  calc.qmeans <- function(fq) {
+    qm <- as(quality(fq), "matrix")
+    col.means <- colMeans(qm, na.rm=T)
+  }
+  q95rlen <- quantile(unlist(sapply(samples, width)), 0.95)
+  qmeans <- lapply(samples, calc.qmeans)
+  df <- data.frame(sample=rep(names(qmeans), lapply(qmeans, length)),
+                   qmeans=unlist(qmeans), row.names=NULL)
+  df <- ddply(df, .(sample), transform, pos=1:length(qmeans))  
+  p <- ggplot(df, aes(pos, qmeans, group=sample, colour=sample))
+  p <- p + geom_line(alpha=0.4) + xlim(0, q95rlen)
+  p <- p + labs(x="Position in the Read", y="Mean Base Quality", colour="Sample")
 }
 
 C3plot <- function(data.dir, file.pattern) {
@@ -278,7 +344,22 @@ C3plot <- function(data.dir, file.pattern) {
     p <- p + geom_line(aes(Cycle, 1-ScoreCumSum, group=lane, colour=lane), alpha=I(0.4))
     p <- p + facet_wrap(~Score) + ylim(0,1)
     p <- p + labs(x="Position in the Read", y="Fraction of Reads", colour="Sample")
-    return(p)
+}
+
+C3plot2 <- function(fqc, samples) {
+  q95rlen <- quantile(unlist(sapply(samples, width)), 0.95)
+  pcq <- fqc[["perCycle"]]$quality
+  pcq <- ddply(pcq, .(lane, Cycle), mutate,
+               CycleCounts=sum(Count),
+               CountFrac=Count/CycleCounts,
+               ScoreCumSum=cumsum(CountFrac))    
+  pcq <- ddply(pcq, .(lane), transform, LaneCounts=CycleCounts[1])
+  pcq <- pcq[pcq$Cycle <= q95rlen, ]
+  subpcq <- pcq[pcq$Score %in% c(18, 20, 24, 28), ]
+  p <- ggplot(subpcq)
+  p <- p + geom_line(aes(Cycle, 1-ScoreCumSum, group=lane, colour=lane), alpha=I(0.4))
+  p <- p + facet_wrap(~Score) + ylim(0,1)
+  p <- p + labs(x="Position in the Read", y="Fraction of Reads", colour="Sample")
 }
 
 D1plot <- function(data.dir, file.pattern) {
@@ -307,6 +388,31 @@ D1plot <- function(data.dir, file.pattern) {
   p <- p + labs(x="Position in the Read", y="Base Frequency", colour="Base")
 }
 
+D1plot2 <- function(samples) {
+  require(reshape)
+  countLetterFreq <- function(fq) {
+    sr <- sread(fq)
+    bases <- c("A", "C", "G", "T")
+    alpha.freq <- alphabetByCycle(sr, bases)[, 1:30]
+    alpha.freq <- data.frame(alpha.freq)
+    colnames(alpha.freq) <- 1:30
+    alpha.freq$base <- rownames(alpha.freq)
+    df <- melt(alpha.freq, id=c("base"))
+    colnames(df) <- c("base", "pos", "count")
+    df <- ddply(df, .(pos), mutate,
+                               total.count=sum(count),
+                               frac.count=count/total.count)
+    return(df)
+  }
+  df <- adply(samples, 1, countLetterFreq)
+  sample.labels <- as.vector(sapply(names(samples), function(l) rep(l, 3*40)))
+  df$sample <- sample.labels
+  p <- ggplot(df, aes(pos, frac.count, group=base, colour=base))
+  p <- p + geom_line(alpha=0.4) + scale_x_discrete(breaks=seq(0, 30, 5))
+  p <- p + facet_wrap(~sample)
+  p <- p + labs(x="Position in the Read", y="Base Frequency", colour="Base")
+}
+
 D2plot <- function(data.dir, file.pattern) {
   require(reshape)
   countLetterFreq <- function(s, data.dir) {
@@ -330,5 +436,30 @@ D2plot <- function(data.dir, file.pattern) {
   p <- ggplot(df, aes(pos, frac.count, group=base, colour=base))
   p <- p + geom_line(alpha=0.4) + scale_x_discrete(breaks=seq(-30, 0, 5))
   p <- p + facet_wrap(~lane)
+  p <- p + labs(x="Position in the Read", y="Base Frequency", colour="Base")
+}
+
+D2plot2 <- function(samples) {
+  require(reshape)
+  countLetterFreq <- function(fq) {
+    sr <- reverse(sread(fq))
+    bases <- c("A", "C", "G", "T")
+    alpha.freq <- alphabetByCycle(sr, bases)[, 1:30]
+    alpha.freq <- data.frame(alpha.freq)
+    colnames(alpha.freq) <- -1:-30
+    alpha.freq$base <- rownames(alpha.freq)
+    df <- melt(alpha.freq, id=c("base"))
+    colnames(df) <- c("base", "pos", "count")
+    df <- ddply(df, .(pos), mutate,
+                               total.count=sum(count),
+                               frac.count=count/total.count)
+    return(df)
+  }
+  df <- adply(samples, 1, countLetterFreq)
+  sample.labels <- as.vector(sapply(names(samples), function(l) rep(l, 3*40)))
+  df$sample <- sample.labels
+  p <- ggplot(df, aes(pos, frac.count, group=base, colour=base))
+  p <- p + geom_line(alpha=0.4) + scale_x_discrete(breaks=seq(-30, 0, 5))
+  p <- p + facet_wrap(~sample)
   p <- p + labs(x="Position in the Read", y="Base Frequency", colour="Base")
 }
