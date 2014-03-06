@@ -156,6 +156,10 @@ PlotPerCycleBaseCalls <- function(data.dir, file.pattern, type="fastq") {
     return(p)
 }
 
+#' Plot number of reads in each sample in an experiment
+#' @param data.dir string path to data
+#' @param file.pattern string pattern for input files
+#' @return plot object
 Aplot <- function(data.dir, file.pattern) {
   samples <- list.files(data.dir, file.pattern)    
   countReads <- function(s, data.dir) {
@@ -171,6 +175,13 @@ Aplot <- function(data.dir, file.pattern) {
   return(p)
 }
 
+#' Plot number of reads in each sample.
+#' 
+#' Bar plot representing number of reads in each sample.
+#' Samples are explected to be separate fastq files. 
+#' @param fqc FastQA from package ShortRead
+#' @return plot object
+#' @export
 Aplot2 <- function(fqc) {
   df <- data.frame(nReads=fqc[['readCounts']]$read,
                    sample=row.names(fqc[['readCounts']]))
@@ -197,6 +208,13 @@ B1plot <- function(data.dir, file.pattern){
   p <- p + labs(x="Read Length", y="Fraction of Reads", colour="Sample")
 }
 
+#' Plot read lenght distribution 
+#' 
+#' Density plot representing freaquencies or readlenths.
+#' Samples are explected to be separate fastq files. 
+#' @param fqc FastQA from package ShortRead
+#' @return plot object
+#' @export
 B1plot2 <- function(samples) {
   rlens <- lapply(samples, width)
   df <- data.frame(sample=rep(names(samples), lapply(rlens, length)),
@@ -236,6 +254,15 @@ B2plot <- function(data.dir, file.pattern) {
   return(p)
 }
 
+#' Plot fraction of reads with particular lengh or longer.
+#' 
+#' Line plot showing fraction of reads on y axis
+#' and minimal read length on x axis.
+#' One line per sample.
+#' Samples are explected to be separage fastq files. 
+#' @param samples ShortReadQ object from package ShortRead
+#' @return plot object
+#' @export
 B2plot2 <- function(samples) {
   rlens <- lapply(samples, width)
   df <- data.frame(sample=rep(names(rlens), lapply(rlens, length)),
@@ -269,6 +296,14 @@ C1plot <- function(data.dir, file.pattern) {
   return(p)
 }
 
+#' Plot mean read quality distribution per sample.
+#' 
+#' Boxplot showing the distribution of mean read quality.
+#' One boxplot per sample.
+#' Samples are explected to be separage fastq files. 
+#' @param samples ShortReadQ object from package ShortRead
+#' @return plot object
+#' @export
 C1plot2 <- function(samples) {
   calc.qmeans <- function(fq) {
     qm <- as(quality(fq), "matrix")
@@ -305,6 +340,14 @@ C2plot <- function(data.dir, file.pattern) {
   return(p)
 }
 
+#' Plot mean base quality at particualar position in the read.
+#' 
+#' Line plot showing mean quality of the bases per position in the read.
+#' One line per sample.
+#' Samples are explected to be separage fastq files. 
+#' @param samples ShortReadQ object from package ShortRead
+#' @return plot object
+#' @export
 C2plot2 <- function(samples) {
   calc.qmeans <- function(fq) {
     qm <- as(quality(fq), "matrix")
@@ -346,6 +389,16 @@ C3plot <- function(data.dir, file.pattern) {
     p <- p + labs(x="Position in the Read", y="Fraction of Reads", colour="Sample")
 }
 
+#' Plot fraction of reads with partucular quality or higher per position.
+#'
+#' 4 line plots, for qualities 18, 20, 24 and 28, showing fraction 
+#' of reads with one of those qualities per position in the read.
+#' One line per sample.
+#' Samples are explected to be separage fastq files. 
+#' @param fqc FastQA from package ShortRead
+#' @param samples ShortReadQ object from package ShortRead
+#' @return plot object
+#' @export
 C3plot2 <- function(fqc, samples) {
   q95rlen <- quantile(unlist(sapply(samples, width)), 0.95)
   pcq <- fqc[["perCycle"]]$quality
@@ -388,6 +441,16 @@ D1plot <- function(data.dir, file.pattern) {
   p <- p + labs(x="Position in the Read", y="Base Frequency", colour="Base")
 }
 
+#' Plot base frequnecy for first 30 nt.
+#'
+#' Linepolots representing frequencies of bases, one line per base,
+#' for first 30 nt in the read (from 5')
+#' One plot per sample.
+#' Samples are explected to be separage fastq files. 
+#' @param fqc FastQA from package ShortRead
+#' @param samples ShortReadQ object from package ShortRead
+#' @return plot object
+#' @export
 D1plot2 <- function(samples) {
   require(reshape)
   countLetterFreq <- function(fq) {
@@ -439,6 +502,16 @@ D2plot <- function(data.dir, file.pattern) {
   p <- p + labs(x="Position in the Read", y="Base Frequency", colour="Base")
 }
 
+#' Plot base frequnecy for last 30 nt.
+#'
+#' Lineplots representing frequencies of bases, one line per base,
+#' for last 30 nt in the read (from 3')
+#' One plot per sample.
+#' Samples are explected to be separage fastq files. 
+#' @param fqc FastQA from package ShortRead
+#' @param samples ShortReadQ object from package ShortRead
+#' @return plot object
+#' @export
 D2plot2 <- function(samples) {
   require(reshape)
   countLetterFreq <- function(fq) {
