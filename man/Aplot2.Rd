@@ -12,6 +12,6 @@
 }
 \description{
   Bar plot representing number of reads in each sample.
-  Samples are explected to be separate fastq files.
+  Samples are expected to be separate fastq files.
 }
 

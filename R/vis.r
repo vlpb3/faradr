@@ -1,12 +1,10 @@
-library(ShortRead)
-library(ggbio)
-library(ggplot2)
-library(plyr)
-
 #' Plot aligned reads over annotated region.
 #' @param aln read alignments in GAlignments objet (GenomicTRanges)
 #' @param annot genome annotations in GRanges object
 #' @param plotfile path for output plot
+#' @importFrom ggbio autoplot tracks
+#' @importFrom ggplot2 aes
+#' @export
 PlotAlignAnnot <- function(aln, annots, plotfile) {
     reads.track <- autoplot(aln)
     annots.track <- autoplot(annots,
@@ -23,6 +21,10 @@ PlotAlignAnnot <- function(aln, annots, plotfile) {
 #' @param aln read alignments in GAlignments objet (GenomicTRanges)
 #' @param annot genome annotations in GRanges object
 #' @param plotfile path for output plot
+#' @importFrom ggbio autoplot tracks
+#' @importFrom ggplot2 aes
+#' @importFrom IRanges coverage
+#' @export
 PlotCoverageAnnot <- function(aln, annots, plotfile) {
     cov <- coverage(aln)
     coverage.track <- autoplot(cov, binwidth=10)
@@ -41,8 +43,9 @@ PlotCoverageAnnot <- function(aln, annots, plotfile) {
 #' @param data.dir string path to data
 #' @param file.pattern string pattern for input files
 #' @return plot object
+#' @importFrom ShortRead qa
+#' @importFrom ggplot2 ggplot geom_boxplot 
 PlotPerCycleQuality <- function(data.dir, file.pattern) {
-    require(ggplot2)
     input.type <- "fastq"
     sreadq.qa <- qa(data.dir, file.pattern, type=input.type)
     perCycle <- sreadq.qa[["perCycle"]]
@@ -178,9 +181,10 @@ Aplot <- function(data.dir, file.pattern) {
 #' Plot number of reads in each sample.
 #' 
 #' Bar plot representing number of reads in each sample.
-#' Samples are explected to be separate fastq files. 
+#' Samples are expected to be separate fastq files. 
 #' @param fqc FastQA from package ShortRead
 #' @return plot object
+#' @importFrom ggplot2 ggplot geom_bar theme labs
 #' @export
 Aplot2 <- function(fqc) {
   df <- data.frame(nReads=fqc[['readCounts']]$read,
@@ -214,6 +218,7 @@ B1plot <- function(data.dir, file.pattern){
 #' Samples are explected to be separate fastq files. 
 #' @param fqc FastQA from package ShortRead
 #' @return plot object
+#' @importFrom ggplot2 ggplot geom_density labs
 #' @export
 B1plot2 <- function(samples) {
   rlens <- lapply(samples, width)
@@ -262,6 +267,8 @@ B2plot <- function(data.dir, file.pattern) {
 #' Samples are explected to be separage fastq files. 
 #' @param samples ShortReadQ object from package ShortRead
 #' @return plot object
+#' @importFrom plyr ddply mutate
+#' @importFrom ggplot2 ggplot geom_line xlim labs
 #' @export
 B2plot2 <- function(samples) {
   rlens <- lapply(samples, width)
@@ -303,6 +310,7 @@ C1plot <- function(data.dir, file.pattern) {
 #' Samples are explected to be separage fastq files. 
 #' @param samples ShortReadQ object from package ShortRead
 #' @return plot object
+#' @importFrom ggplot2 ggplot geom_boxplot theme labs
 #' @export
 C1plot2 <- function(samples) {
   calc.qmeans <- function(fq) {
@@ -347,6 +355,8 @@ C2plot <- function(data.dir, file.pattern) {
 #' Samples are explected to be separage fastq files. 
 #' @param samples ShortReadQ object from package ShortRead
 #' @return plot object
+#' @importFrom plyr ddply 
+#' @importFrom ggplot2 ggplot geom_line xlim labs
 #' @export
 C2plot2 <- function(samples) {
   calc.qmeans <- function(fq) {
@@ -398,6 +408,8 @@ C3plot <- function(data.dir, file.pattern) {
 #' @param fqc FastQA from package ShortRead
 #' @param samples ShortReadQ object from package ShortRead
 #' @return plot object
+#' @importFrom plyr ddply mutate 
+#' @importFrom ggplot2 ggplot geom_line facet_wrap ylim labs
 #' @export
 C3plot2 <- function(fqc, samples) {
   q95rlen <- quantile(unlist(sapply(samples, width)), 0.95)
@@ -416,7 +428,6 @@ C3plot2 <- function(fqc, samples) {
 }
 
 D1plot <- function(data.dir, file.pattern) {
-  require(reshape)
   countLetterFreq <- function(s, data.dir) {
     fq <- yield(FastqSampler(file.path(data.dir, s), n=1000000))  
     sr <- sread(fq)
@@ -450,9 +461,11 @@ D1plot <- function(data.dir, file.pattern) {
 #' @param fqc FastQA from package ShortRead
 #' @param samples ShortReadQ object from package ShortRead
 #' @return plot object
+#' @importFrom reshape melt
+#' @importFrom plyr ddply adply mutate
+#' @importFrom ggplot2 ggplot geom_line scale_x_discrete facet_wrap labs
 #' @export
 D1plot2 <- function(samples) {
-  require(reshape)
   countLetterFreq <- function(fq) {
     sr <- sread(fq)
     bases <- c("A", "C", "G", "T")
@@ -508,9 +521,11 @@ D2plot <- function(data.dir, file.pattern) {
 #' for last 30 nt in the read (from 3')
 #' One plot per sample.
 #' Samples are explected to be separage fastq files. 
-#' @param fqc FastQA from package ShortRead
 #' @param samples ShortReadQ object from package ShortRead
 #' @return plot object
+#' @importFrom reshape melt
+#' @importFrom plyr ddply adply
+#' @importFrom ggplot2 ggplot geom_line scale_x_discrete facet_wrap labs
 #' @export
 D2plot2 <- function(samples) {
   require(reshape)

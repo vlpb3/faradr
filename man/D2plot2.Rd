@@ -5,8 +5,6 @@
   D2plot2(samples)
 }
 \arguments{
-  \item{fqc}{FastQA from package ShortRead}
-
   \item{samples}{ShortReadQ object from package ShortRead}
 }
 \value{
