@@ -486,6 +486,7 @@ D1plot2 <- function(samples) {
   df$sample <- sample.labels
   p <- ggplot(df, aes(pos, frac.count, group=base, colour=base))
   p <- p + geom_line(alpha=0.4) + scale_x_discrete(breaks=seq(0, 30, 5))
+  p <- p + ylim(0,1)
   p <- p + facet_wrap(~sample)
   p <- p + labs(x="Position in the Read", y="Base Frequency", colour="Base")
 }
@@ -548,6 +549,7 @@ D2plot2 <- function(samples) {
   df$sample <- sample.labels
   p <- ggplot(df, aes(pos, frac.count, group=base, colour=base))
   p <- p + geom_line(alpha=0.4) + scale_x_discrete(breaks=seq(-30, 0, 5))
+  p <- p + ylim(0,1)
   p <- p + facet_wrap(~sample)
   p <- p + labs(x="Position in the Read", y="Base Frequency", colour="Base")
 }
