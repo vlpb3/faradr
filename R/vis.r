@@ -489,6 +489,7 @@ D1plot2 <- function(samples) {
   p <- p + ylim(0,1)
   p <- p + facet_wrap(~sample)
   p <- p + labs(x="Position in the Read", y="Base Frequency", colour="Base")
+  p <- p + theme(panel.background=element_rect(fill="white", colour="grey"))
 }
 
 D2plot <- function(data.dir, file.pattern) {
@@ -552,4 +553,5 @@ D2plot2 <- function(samples) {
   p <- p + ylim(0,1)
   p <- p + facet_wrap(~sample)
   p <- p + labs(x="Position in the Read", y="Base Frequency", colour="Base")
+  p <- p + theme(panel.background=element_rect(fill="white", colour="grey"))
 }
