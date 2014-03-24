@@ -322,7 +322,7 @@ C1plot2 <- function(samples) {
   df <- data.frame(sample=rep(names(qmeans), lapply(qmeans, length)),
                    qmeans=unlist(qmeans), row.names=NULL)
   p <- ggplot(df, aes(factor(sample), qmeans, fill=sample))
-  p <- p + geom_boxplot(alpha=0.6)
+  p <- p + geom_boxplot(alpha=0.6, outlier.size=0)
   p <- p + theme(legend.position="none", axis.text.x=element_text(angle=45, hjust=1))
   p <- p + labs(x="Sample", y="Mean Read Quality")
 }
@@ -466,9 +466,10 @@ D1plot <- function(data.dir, file.pattern) {
 #' @importFrom ggplot2 ggplot geom_line scale_x_discrete facet_wrap labs
 #' @export
 D1plot2 <- function(samples) {
+  require(reshape)
   countLetterFreq <- function(fq) {
-    sr <- sread(fq)
     bases <- c("A", "C", "G", "T")
+    sr <- sread(fq)
     alpha.freq <- alphabetByCycle(sr, bases)[, 1:30]
     alpha.freq <- data.frame(alpha.freq)
     colnames(alpha.freq) <- 1:30
@@ -476,8 +477,8 @@ D1plot2 <- function(samples) {
     df <- melt(alpha.freq, id=c("base"))
     colnames(df) <- c("base", "pos", "count")
     df <- ddply(df, .(pos), mutate,
-                               total.count=sum(count),
-                               frac.count=count/total.count)
+                total.count=sum(count),
+                frac.count=count/total.count)
     return(df)
   }
   df <- adply(samples, 1, countLetterFreq)
@@ -493,16 +494,15 @@ D2plot <- function(data.dir, file.pattern) {
   require(reshape)
   countLetterFreq <- function(s, data.dir) {
     fq <- yield(FastqSampler(file.path(data.dir, s), n=1000000))  
-    sr <- reverse(sread(fq))
     bases <- c("A", "C", "G", "T")
     alpha.freq <- alphabetByCycle(sr, bases)[, 1:30]
     alpha.freq <- data.frame(alpha.freq)
     colnames(alpha.freq) <- -1:-30
     alpha.freq$base <- rownames(alpha.freq)
     alpha.freq$lane <- rep(s, 4)
-    df <- melt(alpha.freq, id=c("base", "lane"))
-    colnames(df) <- c("base", "lane", "pos", "count")
-    df <- ddply(df, .(lane, pos), mutate,
+    df <- melt(alpha.freq, id=c("base"))
+    colnames(df) <- c("base", "pos", "count")
+    df <- ddply(df, .(pos), mutate,
                                total.count=sum(count),
                                frac.count=count/total.count)
     return(df)
