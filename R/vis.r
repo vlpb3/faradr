@@ -60,9 +60,9 @@ PlotPerCycleQuality <- function(data.dir, file.pattern) {
 #' @param data.dir string path to data
 #' @param file.pattern string pattern for input files
 #' @return plot 
+#' @importFrom ggplot2 ggplot geom_line geom_area facet_wrap
+#' @importFrom plyr adply ddply mutate
 PlotPerCycleCumQuality <- function(data.dir, file.pattern) {
-    require(ggplot2)
-    require(plyr)
     fastq.files <- list.files(data.dir, file.pattern)
     q95rlen.df <- adply(fastq.files, 1, function(f, data.dir) {
       fq <- readFastq(data.dir, f)
@@ -144,10 +144,9 @@ PlotReadLengthDistribution <- function(data.dir, file.pattern) {
 #' @param file.pattern string pattern for input files
 #' @param type stirng input type, 'fastq' is default value
 #' @return plot 
+#' @importFrom ggplot2 ggplot geom_line geom_point
+#' @importFrom plyr adply ddply mutate
 PlotPerCycleBaseCalls <- function(data.dir, file.pattern, type="fastq") {
-    require(ggplot2)  
-    require(plyr)
-    
     sreadq.qa <- qa(data.dir, file.pattern, type=type)
     perCycleBaseCall <- sreadq.qa[["perCycle"]]$baseCall
     perCycleCounts  <- ddply(perCycleBaseCall, c("Cycle"), summarise,
@@ -312,7 +311,6 @@ C3plot <- function(fqc, samples) {
 #' @importFrom ggplot2 ggplot geom_line scale_x_discrete facet_wrap labs
 #' @export
 D1plot <- function(samples) {
-  require(reshape)
   countLetterFreq <- function(fq) {
     bases <- c("A", "C", "G", "T")
     sr <- sread(fq)

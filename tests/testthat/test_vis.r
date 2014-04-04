@@ -1,5 +1,6 @@
 library(rtracklayer)
 library(GenomicRanges)
+
 context("vis")
 
 # location of sample data for testing

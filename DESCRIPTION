@@ -12,4 +12,5 @@ Imports:
     IRanges,
     plyr,
     reshape,
-    ShortRead
+    ShortRead,
+    testthat
