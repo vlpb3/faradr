@@ -1,6 +1,6 @@
 #' Plot aligned reads over annotated region.
 #' @param aln read alignments in GAlignments objet (GenomicTRanges)
-#' @param annot genome annotations in GRanges object
+#' @param annots genome annotations in GRanges object
 #' @param plotfile path for output plot
 #' @importFrom ggbio autoplot tracks
 #' @importFrom ggplot2 aes
@@ -19,7 +19,7 @@ PlotAlignAnnot <- function(aln, annots, plotfile) {
 
 #' Plot aligned reads over annotated region.
 #' @param aln read alignments in GAlignments objet (GenomicTRanges)
-#' @param annot genome annotations in GRanges object
+#' @param annots genome annotations in GRanges object
 #' @param plotfile path for output plot
 #' @importFrom ggbio autoplot tracks
 #' @importFrom ggplot2 aes
@@ -181,7 +181,7 @@ Aplot <- function(fqc) {
 #' 
 #' Density plot representing freaquencies or readlenths.
 #' Samples are explected to be separate fastq files. 
-#' @param fqc FastQA from package ShortRead
+#' @param samples ShortReadQ object from package ShortRead
 #' @return plot object
 #' @importFrom ggplot2 ggplot geom_density labs
 #' @export
@@ -304,8 +304,7 @@ C3plot <- function(fqc, samples) {
 #' Linepolots representing frequencies of bases, one line per base,
 #' for first 30 nt in the read (from 5')
 #' One plot per sample.
-#' Samples are explected to be separage fastq files. 
-#' @param fqc FastQA from package ShortRead
+#' Each sample is a fastq files. 
 #' @param samples ShortReadQ object from package ShortRead
 #' @return plot object
 #' @importFrom reshape melt
@@ -344,11 +343,11 @@ D1plot <- function(samples) {
 #' Lineplots representing frequencies of bases, one line per base,
 #' for last 30 nt in the read (from 3')
 #' One plot per sample.
-#' Samples are explected to be separage fastq files. 
+#' Each sample is a fastq files. 
 #' @param samples ShortReadQ object from package ShortRead
 #' @return plot object
-#' @importFrom reshape melt mutate
-#' @importFrom plyr ddply adply
+#' @importFrom reshape melt
+#' @importFrom plyr ddply adply mutate
 #' @importFrom ggplot2 ggplot geom_line scale_x_discrete facet_wrap labs
 #' @export
 D2plot <- function(samples) {

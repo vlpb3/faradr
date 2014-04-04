@@ -1,18 +1,17 @@
 \name{Aplot}
 \alias{Aplot}
-\title{Plot number of reads in each sample in an experiment}
+\title{Plot number of reads in each sample.}
 \usage{
-  Aplot(data.dir, file.pattern)
+Aplot(fqc)
 }
 \arguments{
-  \item{data.dir}{string path to data}
-
-  \item{file.pattern}{string pattern for input files}
+  \item{fqc}{FastQA from package ShortRead}
 }
 \value{
-  plot object
+plot object
 }
 \description{
-  Plot number of reads in each sample in an experiment
+Bar plot representing number of reads in each sample.
+Samples are expected to be separate fastq files.
 }
 

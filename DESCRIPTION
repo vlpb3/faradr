@@ -13,7 +13,3 @@ Imports:
     plyr,
     reshape,
     ShortRead
-Collate:
-    'fq.r'
-    'qc.R'
-    'vis.r'

@@ -2,7 +2,7 @@
 \alias{PlotMMDist}
 \title{Plot distribution of mismatches and indels in alignment.}
 \usage{
-  PlotMMDist(bamfile, plotfile)
+PlotMMDist(bamfile, plotfile)
 }
 \arguments{
   \item{bamfile}{string bamfile filepath}
@@ -10,6 +10,6 @@
   \item{plotfile}{string output png filepath}
 }
 \description{
-  Plot distribution of mismatches and indels in alignment.
+Plot distribution of mismatches and indels in alignment.
 }
 
