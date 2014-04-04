@@ -2,7 +2,7 @@
 \alias{PlotPerCycleCumQuality}
 \title{Plot cumulative qualities}
 \usage{
-  PlotPerCycleCumQuality(data.dir, file.pattern)
+PlotPerCycleCumQuality(data.dir, file.pattern)
 }
 \arguments{
   \item{data.dir}{string path to data}
@@ -10,9 +10,9 @@
   \item{file.pattern}{string pattern for input files}
 }
 \value{
-  plot
+plot
 }
 \description{
-  Plot cumulative qualities
+Plot cumulative qualities
 }
 

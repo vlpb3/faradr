@@ -1,4 +1,5 @@
 library(stringr)
+
 context('qc')
 
 # location of sample data for testing

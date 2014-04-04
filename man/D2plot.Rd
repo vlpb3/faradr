@@ -1,0 +1,18 @@
+\name{D2plot}
+\alias{D2plot}
+\title{Plot base frequnecy for last 30 nt.}
+\usage{
+D2plot(samples)
+}
+\arguments{
+  \item{samples}{ShortReadQ object from package ShortRead}
+}
+\value{
+plot object
+}
+\description{
+Lineplots representing frequencies of bases, one line per
+base, for last 30 nt in the read (from 3') One plot per
+sample. Each sample is a fastq files.
+}
+

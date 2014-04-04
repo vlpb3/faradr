@@ -1,0 +1,18 @@
+\name{B2plot}
+\alias{B2plot}
+\title{Plot fraction of reads with particular lengh or longer.}
+\usage{
+B2plot(samples)
+}
+\arguments{
+  \item{samples}{ShortReadQ object from package ShortRead}
+}
+\value{
+plot object
+}
+\description{
+Line plot showing fraction of reads on y axis and minimal
+read length on x axis. One line per sample. Samples are
+explected to be separage fastq files.
+}
+

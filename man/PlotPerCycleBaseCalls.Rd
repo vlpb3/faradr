@@ -2,8 +2,7 @@
 \alias{PlotPerCycleBaseCalls}
 \title{Plot base call per cycle}
 \usage{
-  PlotPerCycleBaseCalls(data.dir, file.pattern,
-    type = "fastq")
+PlotPerCycleBaseCalls(data.dir, file.pattern, type = "fastq")
 }
 \arguments{
   \item{data.dir}{string path to data}
@@ -13,9 +12,9 @@
   \item{type}{stirng input type, 'fastq' is default value}
 }
 \value{
-  plot
+plot
 }
 \description{
-  Plot base call per cycle
+Plot base call per cycle
 }
 

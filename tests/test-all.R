@@ -1,2 +1,3 @@
 library(testthat)
-test_check(faradr)
+
+test_check("faradr")

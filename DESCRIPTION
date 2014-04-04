@@ -7,3 +7,10 @@ Author: Mateusz Kuzak <mateusz.kuzak@gmail.com>
 Maintainer: Mateusz Kuzak <mateusz.kuzak@gmail.com>
 License: MIT
 Imports:
+    ggbio,
+    ggplot2,
+    IRanges,
+    plyr,
+    reshape,
+    ShortRead,
+    testthat

@@ -1,0 +1,17 @@
+\name{Aplot}
+\alias{Aplot}
+\title{Plot number of reads in each sample.}
+\usage{
+Aplot(fqc)
+}
+\arguments{
+  \item{fqc}{FastQA from package ShortRead}
+}
+\value{
+plot object
+}
+\description{
+Bar plot representing number of reads in each sample.
+Samples are expected to be separate fastq files.
+}
+
