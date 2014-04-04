@@ -374,5 +374,4 @@ D2plot <- function(samples) {
   p <- p + facet_wrap(~sample)
   p <- p + labs(x="Position in the Read", y="Base Frequency", colour="Base")
   p <- p + theme(panel.background=element_rect(fill="white", colour="white"))
-  p <- p + geom_hline(aes(colour="grey"), yintercept=c(0.25, 0.5, 0.75))
 }
