@@ -2,7 +2,7 @@ Package: faradr
 Title: Tools for sequencing data analysis.
 Description: Exploration and plotting tools usefull in
     Next Generation Sequencing data analysis.
-Version: 0.1.0
+Version: 0.1.1
 Author: Mateusz Kuzak <mateusz.kuzak@gmail.com>
 Maintainer: Mateusz Kuzak <mateusz.kuzak@gmail.com>
 License: MIT
