@@ -1,4 +1,3 @@
-library(assertthat)
 library(ShortRead)
 #' Trim fastq reads.
 #' 
