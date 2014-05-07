@@ -176,6 +176,43 @@ Aplot <- function(fqc) {
   return(p)
 }
   
+#' Plot number of reads in each sample for each grouping factor.
+#' 
+#' Bar plots representing number of reads in each sample.
+#' There is one bar plot per grouping factor.
+#' Samples are grouped and clored by grouping factor.
+#' Grouping factors are extracted from design table.
+#' Samples are expected to be separate fastq files. 
+#' @param fqc FastQA from package ShortRead
+#' @param design.table data.frame holds information about experimantal design 
+#' @return list of plot objects
+#' @importFrom ggplot2 ggplot geom_bar theme labs
+#' @importFrom stringr str_replace
+#' @export
+A.design.plot <- function(fqc, design.table) {
+    # get names of groups from desing file
+    groups <- names(design.table)
+    groups <- groups[groups != "sampleid"]
+
+    df <- data.frame(nReads=fqc[['readCounts']]$read,
+                     sampleid=str_replace(row.names(fqc[['readCounts']]), "\\.f(ast)?q", ""))
+
+    df <- merge(df, design.table)
+    plots <- lapply(groups, function(g.factor) {
+                    # order by grouping factor
+                    df <- df[order(df[g.factor]), ]
+                    .e <- environment()
+                    p <- ggplot(df, aes(x=sampleid, y=nReads, fill=factor(df[,g.factor])),
+                                environment=.e)
+                    p <- p + geom_bar(alpha=0.6, stat='identity')
+                    p <- p + theme(axis.text.x=element_text(angle=45, hjust=1))
+                    p <- p + guides(fill=guide_legend(title=g.factor))
+                    p <- p + labs(x="Sample", y="Number of Reads")
+                    return(p)
+                 })
+    return(plots)
+}
+
 #' Plot read lenght distribution 
 #' 
 #' Density plot representing freaquencies or readlenths.
