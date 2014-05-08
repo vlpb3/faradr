@@ -231,6 +231,41 @@ B1plot <- function(samples) {
   p <- p + labs(x="Read Length", y="Fraction of Reads", colour="Sample")
 }
 
+#' Plot read lenght distribution 
+#' 
+#' Density plot representing freaquencies or readlenths.
+#' There is one plot per grouping factor.
+#' Samples clored by grouping factor.
+#' Grouping factors are extracted from design.table.
+#' Samples are explected to be separate fastq files. 
+#' @param samples ShortReadQ object from package ShortRead
+#' @param design.table data.frame holds information about experimantal design 
+#' @return list of plot objects
+#' @importFrom ggplot2 ggplot geom_density labs
+#' @importFrom stringr str_replace
+#' @export
+B1.design.plot <- function(samples, design.table) {
+
+    groups <- names(design.table)
+    groups <- groups[groups != "sampleid"]
+
+    rlens <- lapply(samples, width)
+    df <- data.frame(sampleid=rep(names(samples), lapply(rlens, length)),
+                     rlen=unlist(rlens), row.names=NULL)
+    df <- merge(df, design.table)
+    q95rlen <- quantile(df$rlen, 0.95)
+
+    plots <- lapply(groups, function(g.factor){
+           .e <- environment()
+           p <- ggplot(df, aes(rlen, group=sampleid, colour=factor(df[,g.factor])),
+                       environment=.e)
+           p <- p + geom_density(alpha=I(0.4), adjust=3) + xlim(0, q95rlen)
+           p <- p + guides(colour=guide_legend(title=g.factor)) 
+           p <- p + labs(x="Read Length", y="Fraction of Reads")
+                     })
+    return(plots)
+}
+
 #' Plot fraction of reads with particular lengh or longer.
 #' 
 #' Line plot showing fraction of reads on y axis
