@@ -293,6 +293,46 @@ B2plot <- function(samples) {
   p <- p + labs(x="Read Length", y="Fraction of Reads", colour="Sample")
 }
 
+#' Plot fraction of reads with particular lengh or longer.
+#' 
+#' Line plot showing fraction of reads on y axis
+#' and minimal read length on x axis.
+#' One line per sample.
+#' There is one plot per grouping factor.
+#' Samples clored by grouping factor.
+#' Grouping factors are extracted from design.table.
+#' Samples are explected to be separage fastq files. 
+#' @param samples ShortReadQ object from package ShortRead
+#' @param design.table data.frame holds information about experimantal design 
+#' @return plots list of plot objects
+#' @importFrom plyr ddply mutate
+#' @importFrom ggplot2 ggplot geom_line xlim labs
+#' @export
+B2.desgin.plot <- function(samples, design.table) {
+    groups <- names(design.table)
+    groups <- groups[groups != "sampleid"]
+
+    rlens <- lapply(samples, width)
+    df <- data.frame(sampleid=rep(names(rlens), lapply(rlens, length)),
+                     rlen=unlist(rlens), row.names=NULL)
+    q95rlen <- quantile(df$rlen, 0.95)
+    df <- df %.% group_by(sampleid, rlen) %.% summarise(count=n())
+    df <- df %.% group_by(sampleid) %.% mutate(cum.count=cumsum(count),
+                                               frac.count=cum.count/sum(count))
+    df <- merge(df,design.table)
+
+    plots <- lapply(groups, function(g.factor){
+        .e <- environment()
+        p <- ggplot(df, aes(group=sampleid, colour=factor(df[ ,g.factor])),
+                    environment=.e)
+        p <- p + geom_line(aes(rlen, 1-frac.count), alpha=0.4)
+        p <- p + xlim(min(df$rlen), q95rlen)
+        p <- p + guides(colour=guide_legend(title=g.factor)) 
+        p <- p + labs(x="Read Length", y="Fraction of Reads", colour="Sampleid")
+    })
+    return(plots)
+}
+
 #' Plot mean read quality distribution per sample.
 #' 
 #' Boxplot showing the distribution of mean read quality.
