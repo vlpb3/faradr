@@ -357,6 +357,46 @@ C1plot <- function(samples) {
   p <- p + labs(x="Sample", y="Mean Read Quality")
 }
 
+#' Plot mean read quality distribution per sample.
+#' 
+#' Boxplot showing the distribution of mean read quality.
+#' One boxplot per sample.
+#' There is one plot per grouping factor.
+#' Samples clored by grouping factor.
+#' Grouping factors are extracted from design.table.
+#' Samples are explected to be separage fastq files. 
+#' @param samples ShortReadQ object from package ShortRead
+#' @param design.table data.frame holds information about experimantal design 
+#' @return list of plot objects
+#' @importFrom ggplot2 ggplot geom_boxplot theme labs
+#' @export
+C1.design.plot <- function(samples, design.table) {
+
+    groups <- names(design.table)
+    groups <- groups[groups != "sampleid"]
+
+    calc.qmeans <- function(fq) {
+        qm <- as(quality(fq), "matrix")
+        row.means <- rowMeans(qm, na.rm=T)
+        return(row.means)
+    }
+    qmeans <- lapply(samples, calc.qmeans)
+    df <- data.frame(sampleid=rep(names(qmeans), lapply(qmeans, length)),
+                     qmeans=unlist(qmeans), row.names=NULL)
+    df <- merge(df, design.table)
+    plots <- lapply(groups, function(g.factor) {
+                    df <- df[order(df[g.factor]), ]
+                    .e <- environment()
+                    p <- ggplot(df, aes(factor(sampleid), qmeans, fill=factor(df[ ,g.factor])),
+                                environment=.e)
+                    p <- p + geom_boxplot(alpha=0.6, outlier.size=0)
+                    p <- p + theme(axis.text.x=element_text(angle=45, hjust=1))
+                    p <- p + guides(fill=guide_legend(title=g.factor))
+                    p <- p + labs(x="Sampleid", y="Mean Read Quality")
+                     })
+    return(plots)
+}
+
 #' Plot mean base quality at particualar position in the read.
 #' 
 #' Line plot showing mean quality of the bases per position in the read.
