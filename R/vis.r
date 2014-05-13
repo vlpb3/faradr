@@ -428,7 +428,7 @@ C2plot <- function(samples) {
 #' One line per sample.
 #' Samples are explected to be separage fastq files. 
 #' There is one plot per grouping factor.
-#' Samples clored by grouping factor.
+#' Samples colored by grouping factor.
 #' Grouping factors are extracted from design.table.
 #' @param samples ShortReadQ object from package ShortRead
 #' @param design.table data.frame holds information about experimantal design 
@@ -459,6 +459,47 @@ C2.design.plot <- function(samples, design.table) {
         p <- p + guides(colour=guide_legend(title=g.factor)) 
         p <- p + labs(x="Position in the Read", y="Mean Base Quality")
                      }) 
+}
+
+#' Plot fraction of reads with partucular quality or higher per position.
+#'
+#' 4 line plots, for qualities 18, 20, 24 and 28, showing fraction 
+#' of reads with one of those qualities per position in the read.
+#' One line per sample.
+#' Samples are explected to be separage fastq files. 
+#' There is one plot per grouping factor.
+#' Samples colored by grouping factor.
+#' Grouping factors are extracted from design.table.
+#' @param samples ShortReadQ object from package ShortRead
+#' @param fqc FastQA from package ShortRead
+#' @param design.table data.frame holds information about experimantal design 
+#' @return list of plot objects
+#' @import dplyr
+#' @importFrom ggplot2 ggplot geom_line facet_wrap ylim labs
+#' @export
+C3.design.plot <- function(samples, fqc, design.table) {
+    
+    groups <- names(design.table)
+    groups <- groups[groups != "sampleid"]
+
+    border.quals <- c(18, 20, 24, 28)
+    q95rlen <- quantile(unlist(sapply(samples, width)), 0.95)
+    pcq <- fqc[["perCycle"]]$quality
+    pcq$sampleid <- str_replace(pcq$lane, "\\.f(ast)?q", "")
+    pcq <-  merge(pcq, design.table, by='sampleid')
+    pcq <- pcq %.% group_by(sampleid, Cycle) %.% mutate(CycleCounts=sum(Count),
+                                                        CountFrac=Count/CycleCounts,
+                                                        ScoreCumSum=cumsum(CountFrac)) %.% ungroup()
+    pcq <- pcq[pcq$Cycle <= q95rlen, ]
+    subpcq <- pcq[pcq$Score %in% border.quals, ]
+    plots <- lapply(c(groups), function(g.factor){
+        .e <- environment()
+        p <- ggplot(subpcq, environment=.e)
+        p <- p + geom_line(aes_string(x='Cycle', y='1 - ScoreCumSum', group='sampleid', colour=g.factor), alpha=I(0.4))
+        p <- p + facet_wrap(~Score) + ylim(0,1)
+        p <- p + guides(colour=guide_legend(title=g.factor)) 
+        p <- p + labs(x="Position in the Read", y="Fraction of Reads")
+                 })
 }
 
 #' Plot fraction of reads with partucular quality or higher per position.
