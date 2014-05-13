@@ -305,7 +305,6 @@ B2plot <- function(samples) {
 #' @param samples ShortReadQ object from package ShortRead
 #' @param design.table data.frame holds information about experimantal design 
 #' @return plots list of plot objects
-#' @importFrom plyr ddply mutate
 #' @importFrom ggplot2 ggplot geom_line xlim labs
 #' @import dplyr
 #' @export
