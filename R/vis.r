@@ -422,6 +422,45 @@ C2plot <- function(samples) {
   p <- p + labs(x="Position in the Read", y="Mean Base Quality", colour="Sample")
 }
 
+#' Plot mean base quality at particualar position in the read.
+#' 
+#' Line plot showing mean quality of the bases per position in the read.
+#' One line per sample.
+#' Samples are explected to be separage fastq files. 
+#' There is one plot per grouping factor.
+#' Samples clored by grouping factor.
+#' Grouping factors are extracted from design.table.
+#' @param samples ShortReadQ object from package ShortRead
+#' @param design.table data.frame holds information about experimantal design 
+#' @return list of plot objects
+#' @import dplyr
+#' @importFrom ggplot2 ggplot geom_line xlim labs
+#' @export
+C2.design.plot <- function(samples, design.table) {
+    
+    groups <- names(design.table)
+    groups <- groups[groups != "sampleid"]
+
+    calc.qmeans <- function(fq) {
+        qm <- as(quality(fq), "matrix")
+        col.means <- colMeans(qm, na.rm=T)
+    }
+    q95rlen <- quantile(unlist(sapply(samples, width)), 0.95)
+    qmeans <- lapply(samples, calc.qmeans)
+    df <- data.frame(sampleid=rep(names(qmeans), lapply(qmeans, length)),
+                     qmeans=unlist(qmeans), row.names=NULL)
+    df <- df %.% group_by(sampleid) %.% mutate(ones=1, pos=cumsum(ones))
+    df <- merge(df, design.table)
+    plots <- lapply(groups, function(g.factor){
+        .e <- environment()
+        p <- ggplot(df, aes(pos, qmeans, group=sampleid, colour=factor(df[ ,g.factor])),
+                    environment=.e)
+        p <- p + geom_line(alpha=0.4) + xlim(0, q95rlen)
+        p <- p + guides(colour=guide_legend(title=g.factor)) 
+        p <- p + labs(x="Position in the Read", y="Mean Base Quality")
+                     }) 
+}
+
 #' Plot fraction of reads with partucular quality or higher per position.
 #'
 #' 4 line plots, for qualities 18, 20, 24 and 28, showing fraction 
