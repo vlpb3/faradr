@@ -307,6 +307,7 @@ B2plot <- function(samples) {
 #' @return plots list of plot objects
 #' @importFrom plyr ddply mutate
 #' @importFrom ggplot2 ggplot geom_line xlim labs
+#' @import dplyr
 #' @export
 B2.desgin.plot <- function(samples, design.table) {
     groups <- names(design.table)
