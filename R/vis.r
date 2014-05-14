@@ -274,23 +274,23 @@ B1.design.plot <- function(samples, design.table) {
 #' Samples are explected to be separage fastq files. 
 #' @param samples ShortReadQ object from package ShortRead
 #' @return plot object
-#' @importFrom plyr ddply mutate
 #' @importFrom ggplot2 ggplot geom_line xlim labs
+#' @import dplyr
 #' @export
 B2plot <- function(samples) {
-  rlens <- lapply(samples, width)
-  df <- data.frame(sample=rep(names(rlens), lapply(rlens, length)),
-                   rlen=unlist(rlens), row.names=NULL)
-  q95rlen <- quantile(df$rlen, 0.95)
-  df <- ddply(df, .(sample, rlen), transform, counts=length(rlen))
-  df <- df[!duplicated(df), ]
-  df <- ddply(df, .(sample), mutate,
-              cum.counts=cumsum(counts),
-              frac.counts=cum.counts/sum(counts))
-  p <- ggplot(df, aes(group=sample, colour=sample ))
-  p <- p + geom_line(aes(rlen, 1-frac.counts), alpha=0.4)
-  p <- p + xlim(min(df$rlen), q95rlen)
-  p <- p + labs(x="Read Length", y="Fraction of Reads", colour="Sample")
+    rlens <- lapply(samples, width)
+    df <- data.frame(sampleid=rep(names(rlens), lapply(rlens, length)),
+                     rlen=unlist(rlens), row.names=NULL)
+    q95rlen <- quantile(df$rlen, 0.95)
+
+    df <- df %.% group_by(sampleid, rlen) %.% summarise(count=n())
+    df <- df %.% group_by(sampleid) %.% mutate(cum.count=cumsum(count),
+                                               frac.count=cum.count/sum(count))
+
+    p <- ggplot(df, aes(group=sampleid, colour=sampleid ))
+    p <- p + geom_line(aes(rlen, 1-frac.count), alpha=0.4)
+    p <- p + xlim(min(df$rlen), q95rlen)
+    p <- p + labs(x="Read Length", y="Fraction of Reads", colour="Sampleid")
 }
 
 #' Plot fraction of reads with particular lengh or longer.
@@ -404,22 +404,24 @@ C1.design.plot <- function(samples, design.table) {
 #' Samples are explected to be separage fastq files. 
 #' @param samples ShortReadQ object from package ShortRead
 #' @return plot object
-#' @importFrom plyr ddply 
+#' @import dplyr
 #' @importFrom ggplot2 ggplot geom_line xlim labs
 #' @export
 C2plot <- function(samples) {
-  calc.qmeans <- function(fq) {
-    qm <- as(quality(fq), "matrix")
-    col.means <- colMeans(qm, na.rm=T)
-  }
-  q95rlen <- quantile(unlist(sapply(samples, width)), 0.95)
-  qmeans <- lapply(samples, calc.qmeans)
-  df <- data.frame(sample=rep(names(qmeans), lapply(qmeans, length)),
-                   qmeans=unlist(qmeans), row.names=NULL)
-  df <- ddply(df, .(sample), transform, pos=1:length(qmeans))  
-  p <- ggplot(df, aes(pos, qmeans, group=sample, colour=sample))
-  p <- p + geom_line(alpha=0.4) + xlim(0, q95rlen)
-  p <- p + labs(x="Position in the Read", y="Mean Base Quality", colour="Sample")
+    calc.qmeans <- function(fq) {
+        qm <- as(quality(fq), "matrix")
+        col.means <- colMeans(qm, na.rm=T)
+    }
+    q95rlen <- quantile(unlist(sapply(samples, width)), 0.95)
+    qmeans <- lapply(samples, calc.qmeans)
+    df <- data.frame(sampleid=rep(names(qmeans), lapply(qmeans, length)),
+                     qmeans=unlist(qmeans), row.names=NULL)
+
+    df <- df %.% group_by(sampleid) %.% mutate(ones=1, pos=cumsum(ones))
+
+    p <- ggplot(df, aes(pos, qmeans, group=sampleid, colour=sampleid))
+    p <- p + geom_line(alpha=0.4) + xlim(0, q95rlen)
+    p <- p + labs(x="Position in the Read", y="Mean Base Quality", colour="Sampleid")
 }
 
 #' Plot mean base quality at particualar position in the read.
@@ -511,23 +513,24 @@ C3.design.plot <- function(samples, fqc, design.table) {
 #' @param fqc FastQA from package ShortRead
 #' @param samples ShortReadQ object from package ShortRead
 #' @return plot object
-#' @importFrom plyr ddply mutate 
+#' @import dplyr
 #' @importFrom ggplot2 ggplot geom_line facet_wrap ylim labs
 #' @export
 C3plot <- function(fqc, samples) {
-  q95rlen <- quantile(unlist(sapply(samples, width)), 0.95)
-  pcq <- fqc[["perCycle"]]$quality
-  pcq <- ddply(pcq, .(lane, Cycle), mutate,
-               CycleCounts=sum(Count),
-               CountFrac=Count/CycleCounts,
-               ScoreCumSum=cumsum(CountFrac))    
-  pcq <- ddply(pcq, .(lane), transform, LaneCounts=CycleCounts[1])
-  pcq <- pcq[pcq$Cycle <= q95rlen, ]
-  subpcq <- pcq[pcq$Score %in% c(18, 20, 24, 28), ]
-  p <- ggplot(subpcq)
-  p <- p + geom_line(aes(Cycle, 1-ScoreCumSum, group=lane, colour=lane), alpha=I(0.4))
-  p <- p + facet_wrap(~Score) + ylim(0,1)
-  p <- p + labs(x="Position in the Read", y="Fraction of Reads", colour="Sample")
+    border.quals <- c(18, 20, 24, 28)
+    q95rlen <- quantile(unlist(sapply(samples, width)), 0.95)
+    pcq <- fqc[["perCycle"]]$quality
+    pcq$sampleid <- str_replace(pcq$lane, "\\.f(ast)?q", "")
+
+    pcq <- pcq %.% group_by(sampleid, Cycle) %.% mutate(CycleCounts=sum(Count),
+                                                        CountFrac=Count/CycleCounts,
+                                                        ScoreCumSum=cumsum(CountFrac)) %.% ungroup()
+    pcq <- pcq[pcq$Cycle <= q95rlen, ]
+    subpcq <- pcq[pcq$Score %in% border.quals, ]
+    p <- ggplot(subpcq)
+    p <- p + geom_line(aes(Cycle, 1-ScoreCumSum, group=sampleid, colour=sampleid), alpha=I(0.4))
+    p <- p + facet_wrap(~Score) + ylim(0,1)
+    p <- p + labs(x="Position in the Read", y="Fraction of Reads", colour="Sampleid")
 }
 
 #' Plot base frequnecy for first 30 nt.
@@ -539,33 +542,38 @@ C3plot <- function(fqc, samples) {
 #' @param samples ShortReadQ object from package ShortRead
 #' @return plot object
 #' @importFrom reshape melt
-#' @importFrom plyr ddply adply mutate
 #' @importFrom ggplot2 ggplot geom_line scale_x_discrete facet_wrap labs
+#' @import dplyr
 #' @export
 D1plot <- function(samples) {
-  countLetterFreq <- function(fq) {
-    bases <- c("A", "C", "G", "T")
-    sr <- sread(fq)
-    alpha.freq <- alphabetByCycle(sr, bases)[, 1:30]
-    alpha.freq <- data.frame(alpha.freq)
-    colnames(alpha.freq) <- 1:30
-    alpha.freq$base <- rownames(alpha.freq)
-    df <- melt(alpha.freq, id=c("base"))
-    colnames(df) <- c("base", "pos", "count")
-    df <- ddply(df, .(pos), mutate,
-                total.count=sum(count),
-                frac.count=count/total.count)
-    return(df)
-  }
-  df <- adply(samples, 1, countLetterFreq)
-  sample.labels <- as.vector(sapply(names(samples), function(l) rep(l, 3*40)))
-  df$sample <- sample.labels
-  p <- ggplot(df, aes(pos, frac.count, group=base, colour=base))
-  p <- p + geom_line(alpha=0.4) + scale_x_discrete(breaks=seq(0, 30, 5))
-  p <- p + ylim(0,1)
-  p <- p + facet_wrap(~sample)
-  p <- p + labs(x="Position in the Read", y="Base Frequency", colour="Base")
-  p <- p + theme(panel.background=element_rect(fill="white", colour="grey"))
+    countLetterFreq <- function(fq) {
+        bases <- c("A", "C", "G", "T")
+        sr <- sread(fq)
+        alpha.freq <- alphabetByCycle(sr, bases)[, 1:30]
+        alpha.freq <- data.frame(alpha.freq)
+        colnames(alpha.freq) <- 1:30
+        alpha.freq$base <- rownames(alpha.freq)
+        df <- melt(alpha.freq, id=c("base"))
+        colnames(df) <- c("base", "pos", "count")
+        df <- df %.% group_by(pos) %.% mutate(total.count=sum(count),
+                                              frac.count=count/total.count)
+        # df <- ddply(df, .(pos), mutate,
+        #             total.count=sum(count),
+        #             frac.count=count/total.count)
+        return(df)
+    }
+    df.list <- lapply(samples, countLetterFreq)
+    df <- do.call("rbind", df.list)
+    df$sampleid <-sapply(rownames(df),
+                         function(rn) {str_split(rn, "\\.")[[1]][1]},
+                         simplify=TRUE, USE.NAMES=FALSE) 
+     
+    p <- ggplot(df, aes(pos, frac.count, group=base, colour=base))
+    p <- p + geom_line(alpha=0.4) + scale_x_discrete(breaks=seq(0, 30, 5))
+    p <- p + ylim(0,1)
+    p <- p + facet_wrap(~sampleid)
+    p <- p + labs(x="Position in the Read", y="Base Frequency", colour="Base")
+    p <- p + theme(panel.background=element_rect(fill="white", colour="grey"))
 }
 
 #' Plot base frequnecy for last 30 nt.
@@ -577,31 +585,34 @@ D1plot <- function(samples) {
 #' @param samples ShortReadQ object from package ShortRead
 #' @return plot object
 #' @importFrom reshape melt
-#' @importFrom plyr ddply adply mutate
 #' @importFrom ggplot2 ggplot geom_line scale_x_discrete facet_wrap labs
+#' @import dplyr
 #' @export
 D2plot <- function(samples) {
-  countLetterFreq <- function(fq) {
-    sr <- reverse(sread(fq))
-    bases <- c("A", "C", "G", "T")
-    alpha.freq <- alphabetByCycle(sr, bases)[, 1:30]
-    alpha.freq <- data.frame(alpha.freq)
-    colnames(alpha.freq) <- -1:-30
-    alpha.freq$base <- rownames(alpha.freq)
-    df <- melt(alpha.freq, id=c("base"))
-    colnames(df) <- c("base", "pos", "count")
-    df <- ddply(df, .(pos), mutate,
-                               total.count=sum(count),
-                               frac.count=count/total.count)
-    return(df)
-  }
-  df <- adply(samples, 1, countLetterFreq)
-  sample.labels <- as.vector(sapply(names(samples), function(l) rep(l, 3*40)))
-  df$sample <- sample.labels
+    countLetterFreq <- function(fq) {
+        sr <- reverse(sread(fq))
+        bases <- c("A", "C", "G", "T")
+        alpha.freq <- alphabetByCycle(sr, bases)[, 1:30]
+        alpha.freq <- data.frame(alpha.freq)
+        colnames(alpha.freq) <- -1:-30
+        alpha.freq$base <- rownames(alpha.freq)
+        df <- melt(alpha.freq, id=c("base"))
+        colnames(df) <- c("base", "pos", "count")
+        df <- df %.% group_by(pos) %.% mutate(total.count=sum(count),
+                                              frac.count=count/total.count)
+        return(df)
+    }
+    
+    df.list <- lapply(samples, countLetterFreq)
+    df <- do.call("rbind", df.list)
+    df$sampleid <-sapply(rownames(df),
+                         function(rn) {str_split(rn, "\\.")[[1]][1]},
+                         simplify=TRUE, USE.NAMES=FALSE) 
+
   p <- ggplot(df, aes(pos, frac.count, group=base, colour=base))
   p <- p + geom_line(alpha=0.4) + scale_x_discrete(breaks=seq(-30, 0, 5))
   p <- p + ylim(0,1)
-  p <- p + facet_wrap(~sample)
+  p <- p + facet_wrap(~sampleid)
   p <- p + labs(x="Position in the Read", y="Base Frequency", colour="Base")
   p <- p + theme(panel.background=element_rect(fill="white", colour="white"))
 }
