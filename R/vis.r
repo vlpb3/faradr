@@ -56,39 +56,6 @@ PlotPerCycleQuality <- function(data.dir, file.pattern) {
     return(p)
 }
 
-#' Plot cumulative qualities 
-#' @param data.dir string path to data
-#' @param file.pattern string pattern for input files
-#' @return plot 
-#' @importFrom ggplot2 ggplot geom_line geom_area facet_wrap
-#' @importFrom plyr adply ddply mutate
-PlotPerCycleCumQuality <- function(data.dir, file.pattern) {
-    fastq.files <- list.files(data.dir, file.pattern)
-    q95rlen.df <- adply(fastq.files, 1, function(f, data.dir) {
-      fq <- readFastq(data.dir, f)
-      q95rlen <- quantile(width(fq), .95)
-      data.frame(lane=c(f), q95rlen=c(q95rlen))
-    }, data.dir=data.dir)
-    q95rlen.df <- subset(q95rlen.df, select = c(lane, q95rlen))
-
-    input.type <- "fastq"
-    sreadq.qa <- qa(data.dir, file.pattern, type=input.type)
-    perCycle <- sreadq.qa[["perCycle"]]
-    pcq <- perCycle$quality
-    pcq <- ddply(pcq, .(lane, Cycle), mutate, CycleCounts=sum(Count))    
-    pcq$CountFrac <- pcq$Count / pcq$CycleCounts
-    pcq <- ddply(pcq, .(lane, Cycle), mutate, ScoreCumSum=cumsum(CountFrac))
-    pcq <- ddply(pcq, .(lane), mutate, LaneCounts=CycleCounts[1])
-    pcq <- merge(x=pcq, y=q95rlen.df, by="lane", all=TRUE)
-    pcq <- pcq[pcq$Cycle <= pcq$q95rlen, ]
-    subpcq <- pcq[pcq$Score %in% c(15, 20, 25, 30), ]
-    p <- ggplot(subpcq)
-    p <- p + geom_line(aes(Cycle, 1-ScoreCumSum, group=Score, colour=factor(Score)), alpha=I(0.8))
-    p <- p + geom_area(aes(Cycle, CycleCounts / LaneCounts), position="identity", alpha=I(0.1))
-    p <- p + facet_wrap(~lane, scales="free_x")
-    return(p)
-}
-
 #' Plot mean quality per read
 #' @param data.dir path to data dir
 #' @param file.pattern pattern of input fastq
@@ -137,25 +104,6 @@ PlotReadLengthDistribution <- function(data.dir, file.pattern) {
                           binwidth=1)
   p <- p + geom_density(adjust=3) + facet_wrap(~lane)
   return(p)
-}
-
-#' Plot base call per cycle
-#' @param data.dir string path to data
-#' @param file.pattern string pattern for input files
-#' @param type stirng input type, 'fastq' is default value
-#' @return plot 
-#' @importFrom ggplot2 ggplot geom_line geom_point
-#' @importFrom plyr adply ddply mutate
-PlotPerCycleBaseCalls <- function(data.dir, file.pattern, type="fastq") {
-    sreadq.qa <- qa(data.dir, file.pattern, type=type)
-    perCycleBaseCall <- sreadq.qa[["perCycle"]]$baseCall
-    perCycleCounts  <- ddply(perCycleBaseCall, c("Cycle"), summarise,
-                           countsInCycle = sum(Count))
-    perCycleBaseCall$callsFraction <- perCycleBaseCall$Count / perCycleCounts$countsInCycle[perCycleBaseCall$Cycle] 
-    p <- ggplot(perCycleBaseCall, aes(Cycle, callsFraction))
-    p <- p + geom_point(aes(colour=factor(Base)), alpha=0.7)
-    p <- p + geom_line(aes(colour=factor(Base)), alpha=0.7) 
-    return(p)
 }
 
 #' Plot number of reads in each sample.
