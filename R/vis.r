@@ -256,7 +256,7 @@ B2plot <- function(samples) {
 #' @importFrom ggplot2 ggplot geom_line xlim labs
 #' @import dplyr
 #' @export
-B2.desgin.plot <- function(samples, design.table) {
+B2.design.plot <- function(samples, design.table) {
     groups <- names(design.table)
     groups <- groups[groups != "sampleid"]
 
