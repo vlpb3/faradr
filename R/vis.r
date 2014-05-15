@@ -489,8 +489,9 @@ C3plot <- function(fqc, samples) {
 #' Each sample is a fastq files. 
 #' @param samples ShortReadQ object from package ShortRead
 #' @return plot object
-#' @importFrom reshape melt
+#' @importFrom reshape2 melt
 #' @importFrom ggplot2 ggplot geom_line scale_x_discrete facet_wrap labs
+#' @importFrom ggplot2 element_rect
 #' @import dplyr
 #' @export
 D1plot <- function(samples) {
@@ -532,8 +533,9 @@ D1plot <- function(samples) {
 #' Each sample is a fastq files. 
 #' @param samples ShortReadQ object from package ShortRead
 #' @return plot object
-#' @importFrom reshape melt
+#' @importFrom reshape2 melt
 #' @importFrom ggplot2 ggplot geom_line scale_x_discrete facet_wrap labs
+#' @importFrom ggplot2 element_rect
 #' @import dplyr
 #' @export
 D2plot <- function(samples) {
