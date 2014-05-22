@@ -158,6 +158,7 @@ A.design.plot <- function(fqc, design.table) {
                     p <- p + labs(x="Sample", y="Number of Reads")
                     return(p)
                  })
+    names(plots) <- groups
     return(plots)
 }
 
@@ -211,6 +212,7 @@ B1.design.plot <- function(samples, design.table) {
            p <- p + guides(colour=guide_legend(title=g.factor)) 
            p <- p + labs(x="Read Length", y="Fraction of Reads")
                      })
+    names(plots) <- groups
     return(plots)
 }
 
@@ -278,6 +280,7 @@ B2.design.plot <- function(samples, design.table) {
         p <- p + guides(colour=guide_legend(title=g.factor)) 
         p <- p + labs(x="Read Length", y="Fraction of Reads", colour="Sampleid")
     })
+    names(plots) <- groups
     return(plots)
 }
 
@@ -342,6 +345,7 @@ C1.design.plot <- function(samples, design.table) {
                     p <- p + guides(fill=guide_legend(title=g.factor))
                     p <- p + labs(x="Sampleid", y="Mean Read Quality")
                      })
+    names(plots) <- groups
     return(plots)
 }
 
@@ -409,6 +413,8 @@ C2.design.plot <- function(samples, design.table) {
         p <- p + guides(colour=guide_legend(title=g.factor)) 
         p <- p + labs(x="Position in the Read", y="Mean Base Quality")
                      }) 
+    names(plots) <- groups
+    return(plots)
 }
 
 #' Plot fraction of reads with partucular quality or higher per position.
@@ -445,11 +451,15 @@ C3.design.plot <- function(samples, fqc, design.table) {
     plots <- lapply(c(groups), function(g.factor){
         .e <- environment()
         p <- ggplot(subpcq, environment=.e)
-        p <- p + geom_line(aes_string(x='Cycle', y='1 - ScoreCumSum', group='sampleid', colour=g.factor), alpha=I(0.4))
+        p <- p + geom_line(aes_string(x='Cycle', y='1 - ScoreCumSum',
+                                      group='sampleid', colour=g.factor),
+                           alpha=I(0.4))
         p <- p + facet_wrap(~Score) + ylim(0,1)
         p <- p + guides(colour=guide_legend(title=g.factor)) 
         p <- p + labs(x="Position in the Read", y="Fraction of Reads")
                  })
+    names(plots) <- groups
+    return(plots)
 }
 
 #' Plot fraction of reads with partucular quality or higher per position.
