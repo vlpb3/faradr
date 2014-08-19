@@ -20,7 +20,19 @@ packageVersion("devtools")
 VLPB github repository is private one, therefore it is neccessery to
 authenticate in order to download package. 
 
-**devtools >= 1.5** uses github authentication tokens. To generate authentication token for R command line follow instructions
+**devtools > 1.5 uses github authentication tokens. To generate authentication token for R command line follow instructions
+from [Github
+help](https://help.github.com/articles/creating-an-access-token-for-command-line-use)
+Install faradr with devtools
+```R
+install_github("UvA-MAD/faradr",
+        auth_token="github_generated_token")
+```
+rembember to replace "github_generated_token" with your
+login credentials.
+
+
+**devtools = 1.5 uses github authentication tokens. To generate authentication token for R command line follow instructions
 from [Github
 help](https://help.github.com/articles/creating-an-access-token-for-command-line-use)
 Install faradr with devtools
