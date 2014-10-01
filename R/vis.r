@@ -233,8 +233,8 @@ B2plot <- function(samples) {
                      rlen=unlist(rlens), row.names=NULL)
     q95rlen <- quantile(df$rlen, 0.95)
 
-    df <- df %.% group_by(sampleid, rlen) %.% summarise(count=n())
-    df <- df %.% group_by(sampleid) %.% mutate(cum.count=cumsum(count),
+    df <- df %>% group_by(sampleid, rlen) %>% summarise(count=n())
+    df <- df %>% group_by(sampleid) %>% mutate(cum.count=cumsum(count),
                                                frac.count=cum.count/sum(count))
 
     p <- ggplot(df, aes(group=sampleid, colour=sampleid ))
@@ -266,8 +266,8 @@ B2.design.plot <- function(samples, design.table) {
     df <- data.frame(sampleid=rep(names(rlens), lapply(rlens, length)),
                      rlen=unlist(rlens), row.names=NULL)
     q95rlen <- quantile(df$rlen, 0.95)
-    df <- df %.% group_by(sampleid, rlen) %.% summarise(count=n())
-    df <- df %.% group_by(sampleid) %.% mutate(cum.count=cumsum(count),
+    df <- df %>% group_by(sampleid, rlen) %>% summarise(count=n())
+    df <- df %>% group_by(sampleid) %>% mutate(cum.count=cumsum(count),
                                                frac.count=cum.count/sum(count))
     df <- merge(df,design.table)
 
@@ -369,7 +369,7 @@ C2plot <- function(samples) {
     df <- data.frame(sampleid=rep(names(qmeans), lapply(qmeans, length)),
                      qmeans=unlist(qmeans), row.names=NULL)
 
-    df <- df %.% group_by(sampleid) %.% mutate(ones=1, pos=cumsum(ones))
+    df <- df %>% group_by(sampleid) %>% mutate(ones=1, pos=cumsum(ones))
 
     p <- ggplot(df, aes(pos, qmeans, group=sampleid, colour=sampleid))
     p <- p + geom_line(alpha=0.4) + xlim(0, q95rlen)
@@ -403,7 +403,7 @@ C2.design.plot <- function(samples, design.table) {
     qmeans <- lapply(samples, calc.qmeans)
     df <- data.frame(sampleid=rep(names(qmeans), lapply(qmeans, length)),
                      qmeans=unlist(qmeans), row.names=NULL)
-    df <- df %.% group_by(sampleid) %.% mutate(ones=1, pos=cumsum(ones))
+    df <- df %>% group_by(sampleid) %>% mutate(ones=1, pos=cumsum(ones))
     df <- merge(df, design.table)
     plots <- lapply(groups, function(g.factor){
         .e <- environment()
@@ -443,9 +443,9 @@ C3.design.plot <- function(samples, fqc, design.table) {
     pcq <- fqc[["perCycle"]]$quality
     pcq$sampleid <- str_replace(pcq$lane, "\\.f(ast)?q", "")
     pcq <-  merge(pcq, design.table, by='sampleid')
-    pcq <- pcq %.% group_by(sampleid, Cycle) %.% mutate(CycleCounts=sum(Count),
+    pcq <- pcq %>% group_by(sampleid, Cycle) %>% mutate(CycleCounts=sum(Count),
                                                         CountFrac=Count/CycleCounts,
-                                                        ScoreCumSum=cumsum(CountFrac)) %.% ungroup()
+                                                        ScoreCumSum=cumsum(CountFrac)) %>% ungroup()
     pcq <- pcq[pcq$Cycle <= q95rlen, ]
     subpcq <- pcq[pcq$Score %in% border.quals, ]
     plots <- lapply(c(groups), function(g.factor){
@@ -480,9 +480,9 @@ C3plot <- function(fqc, samples) {
     pcq <- fqc[["perCycle"]]$quality
     pcq$sampleid <- str_replace(pcq$lane, "\\.f(ast)?q", "")
 
-    pcq <- pcq %.% group_by(sampleid, Cycle) %.% mutate(CycleCounts=sum(Count),
+    pcq <- pcq %>% group_by(sampleid, Cycle) %>% mutate(CycleCounts=sum(Count),
                                                         CountFrac=Count/CycleCounts,
-                                                        ScoreCumSum=cumsum(CountFrac)) %.% ungroup()
+                                                        ScoreCumSum=cumsum(CountFrac)) %>% ungroup()
     pcq <- pcq[pcq$Cycle <= q95rlen, ]
     subpcq <- pcq[pcq$Score %in% border.quals, ]
     p <- ggplot(subpcq)
@@ -514,7 +514,7 @@ D1plot <- function(samples) {
         alpha.freq$base <- rownames(alpha.freq)
         df <- melt(alpha.freq, id=c("base"))
         colnames(df) <- c("base", "pos", "count")
-        df <- df %.% group_by(pos) %.% mutate(total.count=sum(count),
+        df <- df %>% group_by(pos) %>% mutate(total.count=sum(count),
                                               frac.count=count/total.count)
         # df <- ddply(df, .(pos), mutate,
         #             total.count=sum(count),
@@ -558,7 +558,7 @@ D2plot <- function(samples) {
         alpha.freq$base <- rownames(alpha.freq)
         df <- melt(alpha.freq, id=c("base"))
         colnames(df) <- c("base", "pos", "count")
-        df <- df %.% group_by(pos) %.% mutate(total.count=sum(count),
+        df <- df %>% group_by(pos) %>% mutate(total.count=sum(count),
                                               frac.count=count/total.count)
         return(df)
     }
