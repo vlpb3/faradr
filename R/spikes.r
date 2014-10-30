@@ -2,8 +2,8 @@
 #' @param counts_file csv file with spike counts
 #' @importFrom ggplot2 ggplot geom_point geom_line theme
 #' @export
-PlotSpikes <- function(counts_file) {
-  counts <- read.csv(counts_file, sep="/t")
+PlotSpikeCounts <- function(counts_file) {
+  counts <- read.csv(counts_file, sep="\t")
   samples <- names(counts)[2:length(counts)]
   molten_counts <- melt(counts)
   names(molten_counts) <- c("seqid", "sample", "count")
@@ -20,7 +20,7 @@ PlotSpikes <- function(counts_file) {
 #' @importFrom reshape2 melt
 #' @importFrom dplyr %>% group_by transform
 #' @export
-PlotNormSpikes <- function(counts_file, total_reads) {
+PlotNormalSpikeCounts <- function(counts_file, total_reads) {
   # load count tables into dataframes
   counts <- read.csv(counts_file, sep="\t")
   colnames <- c("sample", "total")
