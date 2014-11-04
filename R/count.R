@@ -12,5 +12,21 @@ PlotSpikeCounts <- function(bam_dir, base_name, table_path) {
   bam_files <- dir_files[!str_detect(dir_files, fixed(".bam.bai"))]
   
   # count alignments in each bam file
+  all_counts <- lapply(bam_files, function(bam) {
+    sampleid <- str_split(bam, fixed(base_name))[[1]][1]
+    aln <- readGAlignments(file.path(bam_dir, bam), "BAM")
+    counts <- table(seqnames(aln))
+    sample_counts <- data.frame(counts)
+    names(sample_counts) <- c("seqid", sampleid)
+    return(sample_counts)
+  })
   
+  # merge those table for each bam file inot one with samples in columns
+  count_table <- Reduce(function(a, b) {
+    merge(a, b, by="seqid")
+  }, all_counts)
+  
+  # save count table into a file
+  write.table(count_table, file=table_path, row.names=F,
+              sep="\t", quote=F)
 }
