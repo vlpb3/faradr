@@ -5,7 +5,7 @@
 #' @importFrom stringr str_detect
 #' @importFrom GenomicAlignments readGAlignments
 #' @export
-PlotSpikeCounts <- function(bam_dir, base_name, table_path) {
+CountTable <- function(bam_dir, base_name, table_path) {
   # fetch list of bam files, with provided base name
   dir_files <- list.files(bam_dir, base_name)
   
