@@ -3,6 +3,7 @@
 #' @param base_name part of the name commot to all the alignment files
 #' @param table_path file path for resulting count table
 #' @importFrom stringr str_detect
+#' @importFrom GenomicAlignments readGAlignments
 #' @export
 PlotSpikeCounts <- function(bam_dir, base_name, table_path) {
   # fetch list of bam files, with provided base name
