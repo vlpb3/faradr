@@ -2,8 +2,8 @@
 #' @param bam_dir directory with alignments
 #' @param base_name part of the name commot to all the alignment files
 #' @param table_path file path for resulting count table
-#' @importFrom stringr str_detect
-#' @importFrom GenomicAlignments readGAlignments
+#' @importFrom stringr str_detect str_split fixed
+#' @importFrom GenomicAlignments readGAlignments seqnames
 #' @export
 CountTable <- function(bam_dir, base_name, table_path) {
   # fetch list of bam files, with provided base name
@@ -16,7 +16,7 @@ CountTable <- function(bam_dir, base_name, table_path) {
   all_counts <- lapply(bam_files, function(bam) {
     sampleid <- str_split(bam, fixed(base_name))[[1]][1]
     aln <- readGAlignments(file.path(bam_dir, bam), "BAM")
-    counts <- table(seqnames(aln))
+    counts <- table(as.character(seqnames(aln)))
     sample_counts <- data.frame(counts)
     names(sample_counts) <- c("seqid", sampleid)
     return(sample_counts)
