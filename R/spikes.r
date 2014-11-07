@@ -45,3 +45,22 @@ PlotNormalSpikeCounts <- function(counts_file, total_reads) {
   p <- p + geom_line()
   p <- p + theme(axis.text.x=element_text(angle=45, hjust=1))
 }
+
+#' Normalise counts based on normalisation spike counts
+#' @param spike_counts file with count table of normalization spikes
+#' @param counts file with counts table to normalize
+#' @param norm_counts file that will be used for calculated normalized counts
+#' @export
+normalize_counts <- function(spike_counts, counts, norm_counts) {
+  get_norm_factors <- function(counts, locfunc=median)  {
+    loggeomeans <- rowMeans(log(counts))
+    apply(counts, 2, function(cnts) {
+      exp(locfunc((log(cnts) - loggeomeans)[is.finite(loggeomeans)]))
+    })
+  }
+  spike_df <- read.table(spike_counts, row.names=1)
+  norm_factors <- get_norm_factors(spike_df)
+  counts_df <- read.table(counts, row.names=1, header = T)
+  norm_df <- t(apply(counts_df,1, function(r){r / norm_factors}))
+  write.table(norm_df, norm_counts, sep = "\t", quote=F)
+}
