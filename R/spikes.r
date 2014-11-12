@@ -18,7 +18,7 @@ PlotSpikeCounts <- function(counts_file) {
 #' @param sample_read_couts named list, number of reads per each sample
 #' @importFrom ggplot2 ggplot geom_point geom_line theme
 #' @importFrom reshape2 melt
-#' @importFrom dplyr %>% group_by transform
+#' @importFrom dplyr %>% group_by
 #' @export
 PlotNormalSpikeCounts <- function(counts_file, total_reads) {
   # load count tables into dataframes
