@@ -1,4 +1,3 @@
-library(ShortRead)
 #' Trim fastq reads.
 #' 
 #' Trim reads from 3' end leaving only bases of quality
@@ -6,6 +5,7 @@ library(ShortRead)
 #' @param sreadq ShortReadQ object
 #' @param min.quality integer minimum allowed quality
 #' @return ShortReadQ object with trimmed reads
+#' @import ShortRead
 QualityTrimReads <- function(sreadq, min.quality) {
     
     # guess encoding from the reads

@@ -6,6 +6,8 @@ library(Rsamtools)
 #' 
 #' @param bamfile string bamfile filepath
 #' @param plotfile string output png filepath 
+#' @importFrom Rsamtools ScanBamParam
+#' @importFrom GenomicAlignments readGAlignments
 PlotMMDist <- function(bamfile, plotfile) {
   param <- ScanBamParam(tag="NM")
   aln <- readGAlignments(bamfile, param=param)
@@ -24,7 +26,9 @@ PlotMMDist <- function(bamfile, plotfile) {
 #' It is calculated by dividing read length
 #' by edit distance (NM tag in bam file).
 #' @param bamfile string bamfile filepath
-#' @param plotfile string output png filepath 
+#' @param plotfile string output png filepath
+#' @importFrom Rsamtools ScanBamParam
+#' @importFrom GenomicAlignments readGAlignments
 PlotMMFracDist <- function(bamfile, plotfile) {
   param <- ScanBamParam(tag="NM")
   aln <- readGAlignments(bamfile, param=param)
@@ -48,6 +52,8 @@ PlotMMFracDist <- function(bamfile, plotfile) {
 #' @param q.threshold integer minimum allowed quality
 #' @return list with average read length and gnumber of bases
 #'  meeting quality requirements
+#' @importFrom Biostrings quality encoding
+#' @importFrom ShortRead trimTails
 GeneralQualityStats <- function(fastq, q.threshold) {
   encod <- encoding(quality(fastq)) 
   if (! q.threshold %in% encod) {

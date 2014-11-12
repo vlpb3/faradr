@@ -7,10 +7,12 @@ Author: Mateusz Kuzak <mateusz.kuzak@gmail.com>
 Maintainer: Mateusz Kuzak <mateusz.kuzak@gmail.com>
 License: MIT
 Imports:
+    Biostrings,
+    GenomicAlignments,
+    IRanges,
+    ShortRead,
+    dplyr,
     ggbio,
     ggplot2,
-    IRanges,
-    plyr,
-    reshape,
-    ShortRead,
-    testthat
+    reshape2,
+    stringr
