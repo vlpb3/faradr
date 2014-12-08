@@ -1,6 +1,6 @@
 #' Plot spike counts
 #' @param counts_file csv file with spike counts
-#' @importFrom ggplot2 ggplot geom_point geom_line theme
+#' @importFrom ggplot2 ggplot geom_point geom_line theme element_text
 #' @export
 PlotSpikeCounts <- function(counts_file) {
   counts <- read.csv(counts_file, sep="\t")
