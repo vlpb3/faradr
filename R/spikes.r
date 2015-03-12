@@ -1,13 +1,17 @@
 #' Plot spike counts
 #' @param counts_file csv file with spike counts
+#' @param log_y_axis use log scale on y axis default off
 #' @importFrom ggplot2 ggplot geom_point geom_line theme element_text
 #' @export
-PlotSpikeCounts <- function(counts_file) {
+PlotSpikeCounts <- function(counts_file,log_y_axis=FALSE) {
   counts <- read.csv(counts_file, sep="\t")
   samples <- names(counts)[2:length(counts)]
   molten_counts <- melt(counts)
   names(molten_counts) <- c("seqid", "sample", "count")
   p <- ggplot(molten_counts, aes(seqid, count, group=sample, colour=sample))
+  if (log_y_axis) { 
+     p <- p + scale_y_continuous(trans = "log2")
+  } 
   p <- p + geom_point()
   p <- p + geom_line()
   p <- p + theme(axis.text.x=element_text(angle=45, hjust=1))
@@ -16,11 +20,12 @@ PlotSpikeCounts <- function(counts_file) {
 #' Plot normalised spike counts
 #' @param counts_file csv file with spike counts
 #' @param sample_read_couts named list, number of reads per each sample
+#' @param log_y_axis use log scale on y axis default off
 #' @importFrom ggplot2 ggplot geom_point geom_line theme
 #' @importFrom reshape2 melt
 #' @importFrom dplyr %>% group_by
 #' @export
-PlotNormalSpikeCounts <- function(counts_file, total_reads) {
+PlotNormalSpikeCounts <- function(counts_file, total_reads,log_y_axis=FALSE) {
   # load count tables into dataframes
   counts <- read.csv(counts_file, sep="\t")
   colnames <- c("sample", "total")
@@ -41,6 +46,9 @@ PlotNormalSpikeCounts <- function(counts_file, total_reads) {
     transform(count_pm=(count*1e6)/total)
 
   p <- ggplot(norm_counts, aes(seqid, count_pm, group=sample, colour=sample))
+  if (log_y_axis) { 
+     p <- p + scale_y_continuous(trans = "log2")
+  } 
   p <- p + geom_point()
   p <- p + geom_line()
   p <- p + theme(axis.text.x=element_text(angle=45, hjust=1))
