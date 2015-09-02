@@ -17,4 +17,5 @@ Imports:
     ggbio,
     ggplot2,
     reshape2,
+    Rsamtools,
     stringr
