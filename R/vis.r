@@ -523,9 +523,10 @@ D1plot <- function(samples) {
     }
     df.list <- lapply(samples, countLetterFreq)
     df <- do.call("rbind", df.list)
-    df$sampleid <-sapply(rownames(df),
-                         function(rn) {str_split(rn, "\\.")[[1]][1]},
-                         simplify=TRUE, USE.NAMES=FALSE) 
+    df$sampleid <- rep(names(samples),each=4*30)
+#    df$sampleid <-sapply(rownames(df),
+#                         function(rn) {str_split(rn, "\\.")[[1]][1]},
+#                         simplify=TRUE, USE.NAMES=FALSE) 
      
     p <- ggplot(df, aes(pos, frac.count, group=base, colour=base))
     p <- p + geom_line(alpha=0.4) + scale_x_discrete(breaks=seq(0, 30, 5))
@@ -565,9 +566,10 @@ D2plot <- function(samples) {
     
     df.list <- lapply(samples, countLetterFreq)
     df <- do.call("rbind", df.list)
-    df$sampleid <-sapply(rownames(df),
-                         function(rn) {str_split(rn, "\\.")[[1]][1]},
-                         simplify=TRUE, USE.NAMES=FALSE) 
+    df$sampleid <- rep(names(samples),each=4*30)
+#    df$sampleid <-sapply(rownames(df),
+#                         function(rn) {str_split(rn, "\\.")[[1]][1]},
+#                         simplify=TRUE, USE.NAMES=FALSE) 
 
   p <- ggplot(df, aes(pos, frac.count, group=base, colour=base))
   p <- p + geom_line(alpha=0.4) + scale_x_discrete(breaks=seq(-30, 0, 5))
