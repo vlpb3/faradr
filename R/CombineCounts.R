@@ -23,7 +23,7 @@ CombineCountTables <- function(path, output, fileSuffix) {
      
   }
   
-  write.table(compileExper, file=output, sep="\t", row.names = F)
+  write.table(compileExper, file=output, sep="\t", row.names = F,quote=F)
 }
 
 # CombineCountTables(path, fileSuffix ) 
